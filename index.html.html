@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercy Consultancy — Candidate System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--border:#1e2d45;--accent:#3b82f6;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px;}
+.lcard{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;width:100%;max-width:400px;}
+.llogo{font-size:22px;font-weight:700;margin-bottom:2px;}
+.lsub{font-size:13px;color:var(--text2);margin-bottom:32px;}
+.llabel{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;display:block;}
+.linput{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px 14px;color:var(--text);font-size:14px;font-family:'DM Mono',monospace;outline:none;margin-bottom:14px;}
+.linput:focus{border-color:var(--accent);}
+.lbtn{width:100%;background:var(--accent);color:white;border:none;border-radius:8px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.lbtn:hover{background:#2563eb;}
+.lerr{color:var(--red);font-size:13px;margin-top:10px;text-align:center;display:none;}
+#app{display:none;}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 20px;display:flex;align-items:center;gap:12px;height:56px;position:sticky;top:0;z-index:100;flex-wrap:wrap;}
+.tb-logo{font-size:16px;font-weight:700;}
+.tb-badge{font-size:11px;border-radius:20px;padding:3px 10px;font-weight:600;}
+.ba{background:rgba(16,185,129,.15);color:#34d399;}
+.bs{background:rgba(59,130,246,.15);color:#60a5fa;}
+.tb-user{font-size:13px;color:var(--text2);}
+.tab-nav{display:flex;gap:4px;margin-left:8px;}
+.tab-btn{background:none;border:1px solid var(--border);border-radius:7px;padding:6px 14px;font-size:13px;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
+.tab-btn:hover{border-color:var(--text2);color:var(--text);}
+.tab-btn.active{background:var(--accent);border-color:var(--accent);color:white;font-weight:600;}
+.tb-logout{margin-left:auto;font-size:13px;color:var(--text2);cursor:pointer;background:none;border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-family:'DM Sans',sans-serif;}
+.tb-logout:hover{border-color:var(--red);color:var(--red);}
+.tabs{display:flex;overflow-x:auto;background:var(--surface);border-bottom:1px solid var(--border);padding:0 16px;gap:2px;}
+.tab{padding:12px 16px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab .cnt{font-size:11px;background:var(--surface2);color:var(--text3);border-radius:10px;padding:1px 7px;margin-left:5px;}
+.tab.active .cnt{background:rgba(59,130,246,.2);color:var(--accent);}
+.controls{padding:14px 16px;display:flex;gap:10px;flex-wrap:wrap;background:var(--bg);border-bottom:1px solid var(--border);}
+.ctrl-search{flex:1;min-width:200px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 14px;color:var(--text);font-size:13px;outline:none;}
+.ctrl-search:focus{border-color:var(--accent);}
+.ctrl-search::placeholder{color:var(--text3);}
+.ctrl-sel{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;cursor:pointer;}
+.stats{display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 14px;}
+.stat-val{font-size:18px;font-weight:700;font-family:'DM Mono',monospace;}
+.stat-label{font-size:11px;color:var(--text3);margin-top:1px;}
+.table-wrap{overflow-x:auto;padding:16px 16px 80px;}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:700px;}
+th{background:var(--surface);color:var(--text3);font-weight:600;padding:10px 12px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);}
+td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+tr:hover td{background:rgba(255,255,255,.02);}
+.name-cell{font-weight:600;color:var(--text);}
+.phone-link{color:var(--accent);text-decoration:none;font-family:'DM Mono',monospace;font-size:12px;}
+.phone-link:hover{text-decoration:underline;}
+.email-link{color:#818cf8;text-decoration:none;font-size:11px;}
+.email-link:hover{text-decoration:underline;}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;}
+.b-my{background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.2);}
+.b-bd{background:rgba(59,130,246,.12);color:#60a5fa;border:1px solid rgba(59,130,246,.2);}
+.b-in{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.2);}
+.b-np{background:rgba(167,139,250,.12);color:#c4b5fd;border:1px solid rgba(167,139,250,.2);}
+.b-mm{background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.2);}
+.b-id{background:rgba(236,72,153,.12);color:#f472b6;border:1px solid rgba(236,72,153,.2);}
+.b-ot{background:rgba(100,116,139,.12);color:#94a3b8;border:1px solid rgba(100,116,139,.2);}
+.permit-y{color:#4ade80;font-size:11px;font-weight:700;}
+.permit-n{color:#f87171;font-size:11px;font-weight:700;}
+.status-sel{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 8px;font-size:12px;cursor:pointer;outline:none;color:var(--text);font-family:'DM Sans',sans-serif;}
+.s-new{border-color:#334155;color:#94a3b8;}
+.s-contacted{border-color:#3b82f6;color:#60a5fa;}
+.s-shortlisted{border-color:#8b5cf6;color:#c4b5fd;}
+.s-placed{border-color:#10b981;color:#34d399;}
+.s-rejected{border-color:#ef4444;color:#f87171;}
+.note-btn{background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:3px 8px;font-size:11px;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.note-btn:hover{border-color:var(--accent);color:var(--accent);}
+.note-text{font-size:11px;color:var(--text2);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block;}
+.note-by{font-size:10px;color:var(--text3);margin-top:2px;}
+.del-btn{background:none;border:1px solid var(--border);border-radius:5px;padding:3px 8px;font-size:11px;color:var(--red);cursor:pointer;font-family:'DM Sans',sans-serif;}
+.del-btn:hover{background:rgba(239,68,68,.1);border-color:var(--red);}
+.claim-btn{background:none;border:1px solid rgba(16,185,129,.4);border-radius:5px;padding:3px 8px;font-size:11px;color:#34d399;cursor:pointer;font-family:'DM Sans',sans-serif;}
+.claim-btn:hover{background:rgba(16,185,129,.1);}
+.release-btn{background:none;border:1px solid rgba(239,68,68,.3);border-radius:5px;padding:3px 8px;font-size:11px;color:#f87171;cursor:pointer;font-family:'DM Sans',sans-serif;margin-left:3px;}
+.release-btn:hover{background:rgba(239,68,68,.1);}
+.owner-tag{font-size:10px;font-weight:600;margin-top:3px;}
+.locked-status{font-size:12px;font-weight:600;}
+.no-data{text-align:center;padding:60px 20px;color:var(--text3);}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:28px;width:100%;max-width:500px;max-height:92vh;overflow-y:auto;}
+.modal-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--text2);margin-bottom:20px;}
+.modal-label{font-size:12px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;display:block;margin-top:14px;}
+.modal-textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;resize:vertical;min-height:80px;outline:none;margin-bottom:16px;}
+.modal-textarea:focus{border-color:var(--accent);}
+.notes-history{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;max-height:160px;overflow-y:auto;margin-top:6px;margin-bottom:14px;}
+.note-entry{padding:6px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.note-entry:last-child{border-bottom:none;}
+.ne-by{font-weight:600;color:var(--accent);font-size:11px;}
+.ne-dt{color:var(--text3);font-size:10px;margin-left:6px;}
+.ne-tx{color:var(--text2);margin-top:2px;}
+.modal-btns{display:flex;gap:10px;justify-content:flex-end;}
+.mbtn-cancel{background:none;border:1px solid var(--border);border-radius:8px;padding:9px 18px;font-size:13px;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;}
+.mbtn-save{background:var(--accent);border:none;border-radius:8px;padding:9px 20px;font-size:13px;color:white;cursor:pointer;font-weight:600;font-family:'DM Sans',sans-serif;}
+/* REPORT PAGE */
+#reportPage{display:none;padding:20px 16px 80px;}
+.rpt-title{font-size:18px;font-weight:700;margin-bottom:4px;}
+.rpt-sub{font-size:13px;color:var(--text2);margin-bottom:20px;}
+.rpt-period{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.rpt-pbtn{background:var(--surface);border:1px solid var(--border);border-radius:7px;padding:6px 14px;font-size:13px;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;}
+.rpt-pbtn.active{background:var(--accent);border-color:var(--accent);color:white;font-weight:600;}
+.staff-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:28px;}
+.staff-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden;}
+.sc-bar{position:absolute;top:0;left:0;width:4px;height:100%;}
+.sc-name{font-size:16px;font-weight:700;margin-bottom:2px;}
+.sc-role{font-size:11px;color:var(--text2);margin-bottom:14px;}
+.sc-metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.sc-metric{background:var(--bg);border-radius:8px;padding:10px 12px;}
+.sc-val{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;}
+.sc-lbl{font-size:11px;color:var(--text3);margin-top:2px;}
+.conv-rate{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;margin-top:12px;padding:8px 14px;border-radius:8px;display:inline-block;}
+.rpt-section{margin-bottom:28px;}
+.rpt-sec-title{font-size:15px;font-weight:700;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid var(--border);}
+.funnel-wrap{display:flex;flex-direction:column;gap:6px;max-width:600px;}
+.funnel-row{display:flex;align-items:center;gap:12px;}
+.funnel-label{font-size:12px;color:var(--text2);width:130px;text-align:right;flex-shrink:0;}
+.funnel-bar-wrap{flex:1;background:var(--bg);border-radius:4px;height:28px;overflow:hidden;}
+.funnel-bar{height:100%;border-radius:4px;display:flex;align-items:center;padding-left:10px;font-size:12px;font-weight:600;color:white;transition:width .5s ease;min-width:2px;}
+.funnel-count{font-size:12px;color:var(--text2);width:40px;flex-shrink:0;}
+.comp-wrap{overflow-x:auto;}
+.comp-table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px;}
+.comp-table th{background:var(--surface);color:var(--text3);font-weight:600;padding:10px 14px;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;border-bottom:1px solid var(--border);}
+.comp-table td{padding:10px 14px;border-bottom:1px solid var(--border);}
+.staff-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;}
+.bar-cell{display:flex;align-items:center;gap:8px;}
+.mini-bar{height:8px;border-radius:4px;min-width:2px;}
+.act-feed{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;}
+.act-item{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px;}
+.act-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.act-text{font-size:13px;color:var(--text);}
+.act-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.act-time{font-size:11px;color:var(--text3);margin-left:auto;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen">
+  <div class="lcard">
+    <div class="llogo">Mercy Consultancy</div>
+    <div class="lsub">Candidate Management System</div>
+    <label class="llabel">Username</label>
+    <input class="linput" type="text" id="unInput" placeholder="Enter username..." autocomplete="username">
+    <label class="llabel">Password</label>
+    <input class="linput" type="password" id="pwInput" placeholder="Enter password..." onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="lbtn" onclick="doLogin()">Sign In</button>
+    <div class="lerr" id="loginErr">Incorrect username or password.</div>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <div><div class="tb-logo">Mercy Consultancy</div></div>
+    <div class="tb-badge" id="roleTag"></div>
+    <div class="tb-user" id="userTag"></div>
+    <div class="tab-nav">
+      <button class="tab-btn active" id="tabCandidates" onclick="switchMainTab('candidates')">&#128101; Candidates</button>
+      <button class="tab-btn" id="tabAnalytics" onclick="switchMainTab('analytics')">&#128202; Analytics</button>
+      <button class="tab-btn" id="tabStaff" onclick="switchMainTab('staff')" style="display:none">&#9881; Staff</button>
+    </div>
+    <button class="tb-logout" onclick="logout()">Sign Out</button>
+  </div>
+
+  <!-- CANDIDATES PAGE -->
+  <div id="candidatesPage">
+    <div class="tabs" id="tabsEl"></div>
+    <div class="controls">
+      <input class="ctrl-search" id="srch" type="text" placeholder="Search name, phone, email, city, position..." oninput="render()">
+      <select class="ctrl-sel" id="fCountry" onchange="render()">
+        <option value="">All Countries</option>
+        <option value="malaysia">Malaysia</option>
+        <option value="bangladesh">Bangladesh</option>
+        <option value="indian">India</option>
+        <option value="nepal">Nepal</option>
+        <option value="myanmar">Myanmar</option>
+        <option value="indonesia">Indonesia</option>
+        <option value="other">Other</option>
+      </select>
+      <select class="ctrl-sel" id="fPermit" onchange="render()">
+        <option value="">All Permits</option>
+        <option value="yes">Has Permit</option>
+        <option value="no">No Permit</option>
+      </select>
+      <select class="ctrl-sel" id="fStatus" onchange="render()">
+        <option value="">All Status</option>
+        <option value="New">New</option>
+        <option value="Contacted">Contacted</option>
+        <option value="Shortlisted">Shortlisted</option>
+        <option value="Placed">Placed</option>
+        <option value="Rejected">Rejected</option>
+      </select>
+      <select class="ctrl-sel" id="fOwner" onchange="render()">
+        <option value="">All Staff</option>
+        <option value="mine">My Candidates</option>
+        <option value="unclaimed">Unclaimed</option>
+      </select>
+    </div>
+    <div class="stats" id="statsEl"></div>
+    <div id="tableEl"></div>
+  </div>
+
+  <!-- ANALYTICS PAGE -->
+  <div id="reportPage">
+    <div class="rpt-title">&#128202; Staff Analytics — Candidates</div>
+    <div class="rpt-sub">Performance overview across all staff</div>
+    <div class="rpt-period">
+      <button class="rpt-pbtn active" onclick="setPeriod('all',this)">All Time</button>
+      <button class="rpt-pbtn" onclick="setPeriod('month',this)">This Month</button>
+      <button class="rpt-pbtn" onclick="setPeriod('week',this)">This Week</button>
+    </div>
+    <div class="staff-cards" id="staffCards"></div>
+    <div class="rpt-section">
+      <div class="rpt-sec-title">&#127945; Candidate Funnel — All Staff Combined</div>
+      <div class="funnel-wrap" id="funnelWrap"></div>
+    </div>
+    <div class="rpt-section">
+      <div class="rpt-sec-title">&#128101; Staff Comparison</div>
+      <div class="comp-wrap">
+        <table class="comp-table">
+          <thead><tr>
+            <th>Staff</th><th>Claimed</th><th>Contacted</th><th>Shortlisted</th>
+            <th>Placed</th><th>Rejected</th><th>Placement Rate</th>
+          </tr></thead>
+          <tbody id="compBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="rpt-section">
+      <div class="rpt-sec-title">&#128336; Recent Activity</div>
+      <div class="act-feed" id="actFeed"></div>
+    </div>
+  </div>
+
+
+  <!-- STAFF MANAGEMENT PAGE (admin only) -->
+  <div id="staffPage" style="display:none;padding:20px 16px 80px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+      <div>
+        <div class="rpt-title">&#9881; Staff Management</div>
+        <div class="rpt-sub">Register staff and assign their candidate tabs</div>
+      </div>
+      <button class="note-btn" data-action="openstaff" style="padding:10px 18px;font-size:13px;border-color:var(--green);color:var(--green);">+ Register Staff</button>
+    </div>
+    <div id="staffList" style="margin-top:20px;"></div>
+  </div>
+
+</div>
+
+
+<!-- NOTE MODAL -->
+<div class="modal-bg" id="noteModal">
+  <div class="modal">
+    <div class="modal-title">Candidate Notes</div>
+    <div class="modal-sub" id="noteModalSub"></div>
+    <div id="notesHistoryWrap"></div>
+    <label class="modal-label">Add New Note</label>
+    <textarea class="modal-textarea" id="noteInput" placeholder="Type your note here..."></textarea>
+    <div class="modal-btns">
+      <button class="mbtn-cancel" onclick="closeNote()">Cancel</button>
+      <button class="mbtn-save" onclick="saveNote()">Save Note</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- CHANGE PASSWORD MODAL -->
+<div class="modal-bg" id="pwModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-title">&#128274; Change Password</div>
+    <div class="modal-sub" id="cpw-name"></div>
+    <input type="hidden" id="cpw-un">
+    <label class="modal-label">New Password</label>
+    <input class="linput" type="password" id="cpw-new" placeholder="Enter new password..." style="margin-bottom:8px">
+    <label class="modal-label">Confirm Password</label>
+    <input class="linput" type="password" id="cpw-confirm" placeholder="Confirm new password..." style="margin-bottom:0">
+    <div id="cpw-err" style="color:var(--red);font-size:12px;margin-top:8px;display:none"></div>
+    <div class="modal-btns" style="margin-top:16px;">
+      <button class="mbtn-cancel" onclick="closePwModal()">Cancel</button>
+      <button class="mbtn-save" onclick="saveChangePw()" style="background:var(--yellow);color:#1a1a00;font-weight:700">Save Password</button>
+    </div>
+  </div>
+</div>
+
+<!-- STAFF MANAGEMENT MODAL -->
+<div class="modal-bg" id="staffModal">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-title" id="staffModalTitle">Register New Staff</div>
+    <div class="modal-sub">Set login details and tab access</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+      <div>
+        <label class="modal-label">Username *</label>
+        <input class="linput" id="sm-un" placeholder="e.g. ahmad.mercy" style="margin-bottom:0">
+      </div>
+      <div>
+        <label class="modal-label">Display Name *</label>
+        <input class="linput" id="sm-name" placeholder="e.g. Ahmad" style="margin-bottom:0">
+      </div>
+      <div>
+        <label class="modal-label">Password *</label>
+        <input class="linput" id="sm-pw" placeholder="Set password" style="margin-bottom:0">
+      </div>
+      <div>
+        <label class="modal-label">Role</label>
+        <select class="linput" id="sm-role" style="margin-bottom:0">
+          <option value="staff">Staff</option>
+          <option value="admin">Admin</option>
+        </select>
+      </div>
+    </div>
+    <label class="modal-label" style="margin-top:16px;">Colour</label>
+    <div id="sm-color" data-selected="0" style="margin-bottom:4px;"></div>
+    <label class="modal-label" style="margin-top:14px;">Tabs This Staff Can Access</label>
+    <div id="sm-tabs" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:4px;"></div>
+    <input type="hidden" id="sm-editun" value="">
+    <div class="modal-btns" style="margin-top:16px;">
+      <button class="mbtn-cancel" onclick="closeStaffModal()">Cancel</button>
+      <button class="mbtn-save" onclick="saveStaff()" style="background:var(--green)">Save Staff</button>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<script>
+
+// ── AUTH ────────────────────────────────────────────────────
+
+// ── AUTH ──────────────────────────────────────────────────────
+// Load staff registry from localStorage (admin can add/edit via UI)
+var DEFAULT_USERS = {
+  'admin':        { password:'mercy@admin2026', role:'admin', displayName:'Jonathan', color:'#10b981', colorBg:'rgba(16,185,129,0.13)', tabs:['all'] },
+  'joey.mercy':   { password:'joey@2026ms',     role:'staff', displayName:'Joey',     color:'#3b82f6', colorBg:'rgba(59,130,246,0.13)',  tabs:['all'] },
+  'selva.mercy':  { password:'selva@2026ms',     role:'staff', displayName:'Selva',    color:'#8b5cf6', colorBg:'rgba(139,92,246,0.13)',  tabs:['all'] },
+  'staff03.mercy':{ password:'ms03@2026jk',     role:'staff', displayName:'Staff 03', color:'#f59e0b', colorBg:'rgba(245,158,11,0.13)',  tabs:['all'] },
+  'staff04.mercy':{ password:'ms04@2026jk',     role:'staff', displayName:'Staff 04', color:'#ec4899', colorBg:'rgba(236,72,153,0.13)',  tabs:['all'] },
+  'staff05.mercy':{ password:'ms05@2026jk',     role:'staff', displayName:'Staff 05', color:'#06b6d4', colorBg:'rgba(6,182,212,0.13)',   tabs:['all'] },
+  'kenvue':       { password:'2.Kenvue@2026',   role:'staff', displayName:'Kenvue',   color:'#f97316', colorBg:'rgba(249,115,22,0.13)',  tabs:['General Workers','Forklift Driver'] }
+};
+var savedUsers = localStorage.getItem('mc_cand_users');
+var USERS = savedUsers ? JSON.parse(savedUsers) : JSON.parse(JSON.stringify(DEFAULT_USERS));
+
+function saveUsers() { localStorage.setItem('mc_cand_users', JSON.stringify(USERS)); }
+
+function getAllowedTabs(un) {
+  var u = USERS[un];
+  if (!u) return [];
+  if (u.role === 'admin') return TABS;
+  if (!u.tabs || u.tabs.length === 0 || u.tabs[0] === 'all') return TABS;
+  return u.tabs;
+}
+
+var currentUser = null;
+var activeTab = 0;
+var noteTarget = null;
+var currentMainTab = 'candidates';
+
+// ── DATA ──────────────────────────────────────────────────────
+const TABS = ['Operation Manager','Forklift Driver','Loading / Unloading','Car Spare Parts','Kitchen & Hospitality','General Workers','Lathe Machine','Barber Community','Direct Interacted','Barber Shop Owner'];
+
+let DB = {
+  'Operation Manager': [
+    {name:"Kamalesh",phone:"+60162186870",email:"kamaleshchelly97@gmail.com",position:"Assistant Manager",city:"Klang",country:"indian",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Wills Yan Chun Fei",phone:"+60129372223",email:"willsyan@gmail.com",position:"Senior Operation Manager",city:"Kuantan",country:"malaysia",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Alageasan Dhayalan",phone:"+60184638771",email:"alageasandhayalan@gmail.com",position:"Assistant Manager",city:"Kuala Lumpur",country:"indian",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Brabu Subarmanian",phone:"+60197600821",email:"brabus.ep@alice-smith.edu.my",position:"Building Manager",city:"Serdang",country:"indian",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Jesintha Ramulua",phone:"+60165923446",email:"jesintha_jc92@yahoo.com",position:"Regional Manager",city:"Puchong",country:"malaysia",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Shaik Dawood",phone:"+60173392149",email:"sdmaster5078@gmail.com",position:"Assistant Manager",city:"Kuala Lumpur",country:"indian",permit:"yes",degree:"no",exp:"yes"},
+    {name:"Wei Kit Koon",phone:"+60122927378",email:"weikitkoon@gmail.com",position:"Senior Production Manager",city:"Selangor",country:"malaysia",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Faza Zaki",phone:"+60163771332",email:"fazazaki2502@gmail.com",position:"Assistant Haulage Manager",city:"Klang",country:"malaysia",permit:"yes",degree:"no",exp:"yes"},
+    {name:"Azizi Ismail",phone:"+60164497922",email:"aziziismail25@gmail.com",position:"Project Manager",city:"Bangi",country:"malaysia",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Mohan Baskaran",phone:"+60135272274",email:"mohan7122@yahoo.com",position:"Project Cost Controller",city:"Gemencheh",country:"indian",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Razali Ibni Hassan",phone:"+60192989424",email:"razali.hassan@yahoo.com",position:"Private Sector",city:"Kuala Lumpur",country:"malaysia",permit:"yes",degree:"no",exp:"yes"},
+    {name:"DHAUZ",phone:"+601121191668",email:"abdullahfirdhaus97@gmail.com",position:"Production Engineer",city:"JB",country:"malaysia",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"B R Parasuraman",phone:"+60126255246",email:"brpara@yahoo.com",position:"Unemployed",city:"Melaka",country:"indian",permit:"yes",degree:"no",exp:"yes"},
+    {name:"Sethulingam Karunagaran",phone:"+60195661868",email:"sethukaruna@gmail.com",position:"Manager",city:"Lunas",country:"indian",permit:"yes",degree:"yes",exp:"no"},
+    {name:"Rodzhanizam",phone:"+60129702627",email:"rodzhanizam@yahoo.co.uk",position:"Manager",city:"Ampang",country:"malaysia",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Sivabalan Vilchamay",phone:"+60182062803",email:"shiva369aries@gmail.com",position:"Administration",city:"Kuala Lumpur",country:"indian",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Mohd Ezan Madiyah",phone:"+60102279517",email:"mohdezan.madiyah@gmail.com",position:"Engineer",city:"Johor Bahru",country:"malaysia",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Manja",phone:"+60108195690",email:"manjafiona308@gmail.com",position:"Senior Sales Executive",city:"Cyberjaya",country:"malaysia",permit:"yes",degree:"yes",exp:"yes"},
+    {name:"Wafi Ramlee",phone:"+60193781189",email:"megatwafi90@gmail.com",position:"Junior Superintendent",city:"Kajang",country:"malaysia",permit:"yes",degree:"yes",exp:"yes"}
+  ],
+  'Forklift Driver': [
+    {name:"ROBIN TAN",phone:"+60195822840",email:"noventhanlangkan@gmail.com",position:"Forklift Driver",city:"Kajang",country:"malaysia",permit:"yes"},
+    {name:"Kamal Munawir Ismail",phone:"+60194925212",email:"kamalmunawir@gmail.com",position:"Forklift Driver",city:"Banting",country:"malaysia",permit:"yes"},
+    {name:"Hajeli Chai",phone:"+601129996379",email:"sherlychai99@gmail.com",position:"Forklift Driver",city:"Selangor",country:"malaysia",permit:"yes"},
+    {name:"Juhari Hamid",phone:"+60127500010",email:"jsucre.hamid@gmail.com",position:"Forklift Driver",city:"Labis",country:"malaysia",permit:"yes"},
+    {name:"Disks Man",phone:"+60129069992",email:"Muhdwafiyraziq02@gmail.com",position:"Forklift Driver",city:"Tawau",country:"malaysia",permit:"yes"},
+    {name:"Haidar Mahamud",phone:"+60174490610",email:"haiderfakir19@gmail.com",position:"Forklift Driver",city:"Klang",country:"bangladesh",permit:"yes"},
+    {name:"Guna Murugasu",phone:"+60192265710",email:"gunamurugasu65@gmail.com",position:"Forklift Driver",city:"Klang",country:"indian",permit:"yes"},
+    {name:"Vimalanathan",phone:"+60105471770",email:"rtzvimal@gmail.com",position:"Operator",city:"Kapar",country:"indian",permit:"yes"},
+    {name:"Yazid Abd Rahim",phone:"+60183136445",email:"troycastor78@gmail.com",position:"Forklift Driver",city:"Klang",country:"malaysia",permit:"yes"},
+    {name:"Razali",phone:"+60108675708",email:"vruganov7@gmail.com",position:"Lathe Operator",city:"Hulu Langat",country:"malaysia",permit:"yes"},
+    {name:"Hamdan Hasan",phone:"+60123908515",email:"hamdanhjdan@gmail.com",position:"General Worker",city:"Bukit Rotan",country:"malaysia",permit:"yes"},
+    {name:"syafiq maula",phone:"+601110177051",email:"syafiq.maula24@gmail.com",position:"Forklift Driver",city:"Kajang",country:"malaysia",permit:"yes"},
+    {name:"gaggu",phone:"+60146451667",email:"mandeep463681@gmail.com",position:"Forklift Driver",city:"KL",country:"indian",permit:"yes"},
+    {name:"Pravindran Indran",phone:"+601136122416",email:"pravinindran1@gmail.com",position:"Warehouse Assistant",city:"Shah Alam",country:"indian",permit:"yes"},
+    {name:"Abdul Halim Bin Hashim",phone:"+601164632071",email:"bkr77110@gmail.com",position:"Forklift Driver",city:"Klang",country:"malaysia",permit:"yes"},
+    {name:"Jie Fizzie",phone:"+60103887565",email:"nuraffizzie10@gmail.com",position:"Forklift Driver",city:"Shah Alam",country:"malaysia",permit:"yes"},
+    {name:"Nazhan",phone:"+601163732007",email:"nazhansyahmi00@gmail.com",position:"QC/QA Inspector",city:"Kuala Terengganu",country:"malaysia",permit:"yes"},
+    {name:"Hema Chandran",phone:"+60172984562",email:"hemakanan3@gmail.com",position:"Operator",city:"Klang",country:"indian",permit:"yes"},
+    {name:"Eidsor Bai",phone:"+601121068303",email:"eidsorbaiee@gmail.com",position:"General Worker",city:"Kuantan",country:"bangladesh",permit:"yes"},
+    {name:"Kiong Migie",phone:"+60187842188",email:"kiongmigie0@gmail.com",position:"Forklift Driver",city:"Johor",country:"malaysia",permit:"yes"},
+    {name:"Shadin Shadin",phone:"+601139862563",email:"shadin13497@gmail.com",position:"Forklift Driver",city:"Ipoh",country:"malaysia",permit:"yes"},
+    {name:"Qi Shen Lim",phone:"+60126870543",email:"limqishen@gmail.com",position:"Forklift Driver",city:"Seremban",country:"malaysia",permit:"yes"},
+    {name:"Mr.Nesan",phone:"+60133090472",email:"ganessann06@gmail.com",position:"Forklift Driver",city:"Selangor",country:"indian",permit:"yes"},
+    {name:"bilal muhammad",phone:"+60172047973",email:"ubmalikkhan123@gmail.com",position:"General Worker",city:"Selangor",country:"bangladesh",permit:"yes"},
+    {name:"Nagendran Nagen",phone:"+60142302164",email:"nnagen452@gmail.com",position:"Store Assistant",city:"Bukit Mertajam",country:"indian",permit:"yes"},
+    {name:"peng_wills",phone:"+60128716673",email:"pengiranska2022@gmail.com",position:"General Worker",city:"Miri",country:"malaysia",permit:"yes"},
+    {name:"Ashraful Alam",phone:"+60142527215",email:"ahmedjabed669@gmail.com",position:"Forklift/Wheel Loader",city:"Delhi",country:"bangladesh",permit:"yes"},
+    {name:"md.kamruzzaman",phone:"+8801175338277",email:"kamruzzaman1482@gmail.com",position:"General Worker",city:"Kuala Lumpur",country:"bangladesh",permit:"yes"},
+    {name:"Ajora Joe",phone:"+60146504220",email:"ajoramr86@gmail.com",position:"Forklift Driver",city:"Tuaran",country:"malaysia",permit:"yes"},
+    {name:"Boyaim Rahim",phone:"+601115961929",email:"rahimjantan052@gmail.com",position:"Forklift Driver",city:"Malacca",country:"malaysia",permit:"yes"},
+    {name:"Sivashamuganthan",phone:"+60122750925",email:"sivashamuganthan@icloud.com",position:"Store Keeper",city:"Johor Bahru",country:"indian",permit:"yes"},
+    {name:"Jeevitha Ranggi Kutty",phone:"+60172249604",email:"jeevithajeevitha680@gmail.com",position:"Operator",city:"Johor Bahru",country:"indian",permit:"yes"},
+    {name:"salman",phone:"+601111472483",email:"salmanrasul87@gmail.com",position:"Electrical Work",city:"Kuala Lumpur",country:"bangladesh",permit:"yes"},
+    {name:"Boy Arasu",phone:"+60146604076",email:"boyarasu81@gmail.com",position:"Lab Sampler",city:"Kuala Lumpur",country:"indian",permit:"yes"}
+  ],
+  'Loading / Unloading': [
+    {name:"Habib Bhuiyan",phone:"+60179424407",email:"habibrm550@gmail.com",position:"Loading/Unloading",city:"KL",country:"bangladesh",permit:"no",date:"19 Mar"},
+    {name:"Riyaz Rakha",phone:"+60189420507",email:"riyazrakha133@gmail.com",position:"Warehouse Packing",city:"KL",country:"indian",permit:"no",date:"19 Mar"},
+    {name:"Jyoti Prasad",phone:"+601160974971",email:"pmma.chapaijyotiprasad@gmail.com",position:"Supervisor",city:"Kathmandu",country:"nepal",permit:"yes",date:"19 Mar"},
+    {name:"Vineeth Ashokan",phone:"+918075962309",email:"vineetheastkadirur@gmail.com",position:"General Helper",city:"Thalassery",country:"indian",permit:"no",date:"19 Mar"},
+    {name:"Muhd Mirul",phone:"+601164620825",email:"makkaurempit@gmail.com",position:"Loading/Unloading",city:"Shah Alam",country:"malaysia",permit:"yes",date:"19 Mar"},
+    {name:"Salamat Ullah",phone:"+60135426831",email:"salamatullah252@gmail.com",position:"General Worker",city:"Selangor",country:"bangladesh",permit:"yes",date:"19 Mar"},
+    {name:"Arnaf Enamul",phone:"+60194242074",email:"enamulzzzzz05@gmail.com",position:"Loading/Unloading",city:"Comilla",country:"bangladesh",permit:"no",date:"19 Mar"},
+    {name:"Umer Zahid",phone:"+60145378522",email:"umercama86@gmail.com",position:"Internship",city:"Subang Jaya",country:"bangladesh",permit:"no",date:"19 Mar"},
+    {name:"Ajora Joe",phone:"+60146504220",email:"ajoramr86@gmail.com",position:"General Worker",city:"Tuaran",country:"malaysia",permit:"no",date:"19 Mar"},
+    {name:"Shihab Uddin Shihab",phone:"+601128518587",email:"shihabuddinshihab1620@gmail.com",position:"Worker",city:"Petaling Jaya",country:"bangladesh",permit:"no",date:"20 Mar"},
+    {name:"md.kamruzzaman",phone:"+8801175338277",email:"kamruzzaman1482@gmail.com",position:"General Worker",city:"KL",country:"bangladesh",permit:"yes",date:"20 Mar"},
+    {name:"Anuar Muhamad",phone:"+60137598163",email:"anotchemat163@gmail.com",position:"Handyman",city:"Alor Setar",country:"malaysia",permit:"no",date:"20 Mar"},
+    {name:"Md Hussain Ahmed",phone:"+8801764225158",email:"bithiraninath87@gmail.com",position:"General Worker",city:"Sylhet",country:"bangladesh",permit:"no",date:"20 Mar"},
+    {name:"Mil Sanda",phone:"+60197864194",email:"tunis4200@gmail.com",position:"General Worker",city:"Miri",country:"malaysia",permit:"yes",date:"20 Mar"},
+    {name:"Sathish Kumar",phone:"+601168673648",email:"sathishshya05@gmail.com",position:"Data Entry",city:"Selangor",country:"indian",permit:"no",date:"20 Mar"},
+    {name:"k18",phone:"+60178514730",email:"santhoshbarath400@gmail.com",position:"Operator",city:"Selangor",country:"indian",permit:"no",date:"20 Mar"},
+    {name:"Kalyan Roy",phone:"+601140281449",email:"kalyanroy1905@gmail.com",position:"Carpenter/Driver",city:"Palashi",country:"indian",permit:"yes",date:"20 Mar"},
+    {name:"Jeevitha Ranggi Kutty",phone:"+60172249604",email:"jeevithavitha14@gmail.com",position:"Operator",city:"Klang",country:"indian",permit:"no",date:"20 Mar"},
+    {name:"Rana Nasir Uddin",phone:"+601167714290",email:"panunu08@gmail.com",position:"General Worker",city:"Johor",country:"bangladesh",permit:"yes",date:"20 Mar"},
+    {name:"Haidar Mahamud",phone:"+60174490610",email:"haiderfakir19@gmail.com",position:"Packing",city:"Klang",country:"bangladesh",permit:"yes",date:"20 Mar"},
+    {name:"Chiyan Bharathi",phone:"+601161803316",email:"chiyanbharathi10@gmail.com",position:"Supermarket",city:"Shah Alam",country:"indian",permit:"yes",date:"20 Mar"},
+    {name:"Christ Sanjay",phone:"+601128299608",email:"shantisena7@gmail.com",position:"General Worker",city:"KL",country:"nepal",permit:"yes",date:"20 Mar"},
+    {name:"Mahmudul Hasan Rifat",phone:"+60177500818",email:"rfrifat642263@gmail.com",position:"Forklift Driver",city:"Ampang",country:"bangladesh",permit:"yes",date:"20 Mar"},
+    {name:"Sreedharan Vellayudhan",phone:"+601116302673",email:"sreedharan100958@gmail.com",position:"Truck Driver",city:"Seremban",country:"indian",permit:"no",date:"21 Mar"},
+    {name:"Partap Singh Gill",phone:"+601123655405",email:"inderpreetkaur8493@gmail.com",position:"Head Worker",city:"Tarn Taran",country:"indian",permit:"no",date:"21 Mar"},
+    {name:"Abishek Kumar Singh",phone:"+601117522007",email:"singhabishek804@gmail.com",position:"Machine Operator",city:"Bayan Lepas",country:"nepal",permit:"yes",date:"21 Mar"},
+    {name:"Arifur Rahman",phone:"+601116564667",email:"arifurrahman120@yahoo.com",position:"Restaurant",city:"Dhaka",country:"bangladesh",permit:"no",date:"21 Mar"},
+    {name:"Karthigaipandi",phone:"+60104322131",email:"sathishkarthik055@gmail.com",position:"Store Keeper",city:"Viruthunagar",country:"indian",permit:"yes",date:"21 Mar"},
+    {name:"Vivek Devan",phone:"+918870490048",email:"vivekdevan77@gmail.com",position:"General Worker",city:"Theni",country:"indian",permit:"yes",date:"21 Mar"},
+    {name:"safkat mawla",phone:"+601126892197",email:"mollasujan699@gmail.com",position:"Security",city:"KL",country:"bangladesh",permit:"no",date:"21 Mar"},
+    {name:"Md Liton Ali",phone:"+60137584901",email:"mdlitonali5155@gmail.com",position:"Any",city:"Sepang",country:"bangladesh",permit:"no",date:"21 Mar"},
+    {name:"Saiful Islam Prem",phone:"+8801771983740",email:"saifulislamprem2000@gmail.com",position:"General Worker",city:"BD",country:"bangladesh",permit:"yes",date:"21 Mar"},
+    {name:"MD Aminul Islam",phone:"+601116154611",email:"aminulmiah324@gmail.com",position:"General Worker",city:"Rawang",country:"bangladesh",permit:"no",date:"21 Mar"},
+    {name:"Matthew Francis",phone:"+60133216357",email:"matthew_8599@yahoo.com",position:"Warehousing",city:"Kuala Selangor",country:"malaysia",permit:"no",date:"21 Mar"},
+    {name:"Rampukar Yadav",phone:"+601117342640",email:"rampukarprasadyadav35@gmail.com",position:"Factory Worker",city:"Kalaiya",country:"nepal",permit:"no",date:"21 Mar"},
+    {name:"Chandrasekhar Sharma",phone:"+919631066353",email:"sekhar11685@gmail.com",position:"Loading/Unloading",city:"Port Klang",country:"indian",permit:"yes",date:"21 Mar"},
+    {name:"Ashen Chathuranga",phone:"+6587636030",email:"chathurangaashensilva@gmail.com",position:"Warehouse",city:"KL",country:"other",permit:"yes",date:"21 Mar"},
+    {name:"Md Safikul Islam",phone:"+60135464853",email:"imdsafikul878@gmil.com",position:"Forklift Driver",city:"KL",country:"bangladesh",permit:"yes",date:"21 Mar"},
+    {name:"Weng Gip Yeang",phone:"+601155865283",email:"yeangwenggip@vmail.com",position:"Any Job",city:"Penang",country:"malaysia",permit:"no",date:"21 Mar"},
+    {name:"Suresh",phone:"+60105478799",email:"sresh4969@gmail.com",position:"Operator",city:"Klang",country:"indian",permit:"no",date:"21 Mar"},
+    {name:"Tasi Sherpa",phone:"+9779807929263",email:"Tasisherpa0001@gmail.com",position:"General Worker",city:"Phidim",country:"nepal",permit:"no",date:"28 Mar"},
+    {name:"Mohd Hanif Fitri",phone:"+601163972948",email:"danielfitri1011@gmail.com",position:"Sorter",city:"KL",country:"malaysia",permit:"no",date:"28 Mar"},
+    {name:"Nafiz Ahmmed",phone:"+8801518337368",email:"dangernafizz7334@gmail.com",position:"Skilled Worker",city:"Selangor",country:"bangladesh",permit:"yes",date:"28 Mar"},
+    {name:"Alamin Mahamud Joy",phone:"+60149726037",email:"alamin178127@gmail.com",position:"Warehouse",city:"KL",country:"bangladesh",permit:"yes",date:"29 Mar"},
+    {name:"Hezron King",phone:"+60168408069",email:"Rubenihezron8@gamil.com",position:"Technician",city:"KL",country:"malaysia",permit:"no",date:"29 Mar"},
+    {name:"Chai Siew Cheng",phone:"+60166735159",email:"cscheng2016@gmail.com",position:"General Worker",city:"Miri",country:"malaysia",permit:"no",date:"29 Mar"},
+    {name:"AJAY KUMAR",phone:"+919889123441",email:"",position:"General Worker",city:"India",country:"indian",permit:"no",date:"30 Mar"},
+    {name:"RAJAT KUMAR",phone:"+601140192823",email:"",position:"Loading/Unloading",city:"India",country:"indian",permit:"yes",date:"31 Mar"},
+    {name:"MAKMUR",phone:"+60182033724",email:"",position:"Loading/Unloading",city:"Indonesia",country:"indonesia",permit:"yes",date:"31 Mar"},
+    {name:"Prabin Patel",phone:"+601128443402",email:"6069patel@gmail.com",position:"Warehouse",city:"Klang",country:"nepal",permit:"yes",date:"31 Mar"},
+    {name:"Masud Kaiser",phone:"+601127289347",email:"masudkaiser678@gmail.com",position:"Mechanic",city:"Kajang",country:"bangladesh",permit:"no",date:"31 Mar"},
+    {name:"Suresh Lakshmanan",phone:"+918525929772",email:"suresh010021980@gmail.com",position:"Welder",city:"Thanjavur",country:"indian",permit:"yes",date:"31 Mar"},
+    {name:"Deep Soat",phone:"+601116641600",email:"ohimunda29@gmail.com",position:"Labour",city:"KL",country:"indian",permit:"no",date:"31 Mar"},
+    {name:"Arathya",phone:"+601127633797",email:"kumarsathiya44@gmail.com",position:"Loader",city:"Kedah",country:"indian",permit:"no",date:"31 Mar"},
+    {name:"Saruar Saruar",phone:"+601127186995",email:"shinhashinha07@gmail.com",position:"Professional",city:"Ampang",country:"bangladesh",permit:"no",date:"31 Mar"},
+    {name:"ahben",phone:"+60124449657",email:"ahbenahben379@gmail.com",position:"Finding Job",city:"Puchong",country:"malaysia",permit:"no",date:"31 Mar"},
+    {name:"Sarulnizam bin Ibrahim",phone:"+60125808681",email:"sarulnizam7777777@gmaim.com",position:"Leader",city:"Kampar",country:"malaysia",permit:"no",date:"1 Apr"},
+    {name:"Mantri Chaitanya",phone:"+601163959526",email:"kukkymantri@gmail.com",position:"Driver",city:"Puchong",country:"indian",permit:"no",date:"1 Apr"},
+    {name:"MD Abul Bashar",phone:"+601112295825",email:"mdbasharremix22742722@gmail.com",position:"Air-conditioning",city:"Puchong",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"Johnny Ling",phone:"+60167357127",email:"johnling440@gmail.com",position:"Any Job",city:"West Malaysia",country:"malaysia",permit:"no",date:"1 Apr"},
+    {name:"Ganesan Nesan",phone:"+60188733706",email:"ganasan6667@gmail.com",position:"Security",city:"Klang",country:"malaysia",permit:"yes",date:"1 Apr"},
+    {name:"Arun Kumar",phone:"+918056908701",email:"akarunsanjeeth007@gamil.com",position:"Plumbing",city:"Tiruchirappalli",country:"indian",permit:"yes",date:"1 Apr"},
+    {name:"Nazrol Aripin",phone:"+601130069731",email:"aloibentayan36@gmail.com",position:"Loading Kontena",city:"Subang Jaya",country:"malaysia",permit:"yes",date:"1 Apr"},
+    {name:"Sarvin_",phone:"+60164326102",email:"sarvindrankumar@gmail.com",position:"Storekeeper",city:"Kulim",country:"malaysia",permit:"no",date:"1 Apr"},
+    {name:"Farhan Shah",phone:"+601111719950",email:"jutawanforextraderclub01@gmail.com",position:"General Worker",city:"Klang",country:"malaysia",permit:"yes",date:"1 Apr"},
+    {name:"MD azmir",phone:"+60179505284",email:"hossainms1545331@gmail.com",position:"Packing/Loading",city:"Dhaka",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"Arun Paul",phone:"+601166403119",email:"jlove8753@gmail.com",position:"Packing",city:"Jalandhar",country:"indian",permit:"no",date:"1 Apr"},
+    {name:"Md Hafiz Khan",phone:"+601139025510",email:"hafizurrahman987276@gmail.com",position:"Fruit Packing",city:"Penang",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"Muhammad Aslam",phone:"+60146410484",email:"aslam931206@gmail.com",position:"Security",city:"Batu Pahat",country:"malaysia",permit:"yes",date:"1 Apr"},
+    {name:"Mohammad Bin Mizan",phone:"+60179796106",email:"mizanurrahman210992@gmail.com",position:"Forklift Driver",city:"KL",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"Saravanan Sara",phone:"+60146226197",email:"mugams572@gmail.com",position:"Operator",city:"Shah Alam",country:"malaysia",permit:"yes",date:"1 Apr"},
+    {name:"Satish Kumar Danesh",phone:"+601123313269",email:"satishlaxmi1013@gmail.com",position:"General Worker",city:"Sungai Buloh",country:"malaysia",permit:"no",date:"1 Apr"},
+    {name:"Nyaz Prince",phone:"+919170651513",email:"mohdnyaz314@gmail.com",position:"Cooking",city:"Fatehpur",country:"indian",permit:"yes",date:"1 Apr"},
+    {name:"Othman Alghazali",phone:"+601161169185",email:"othmanalghazali02@gmail.com",position:"Unemployed",city:"JB",country:"malaysia",permit:"yes",date:"1 Apr"},
+    {name:"Narinder Singh",phone:"+601168534054",email:"ns032785@gmail.com",position:"Work",city:"Malacca",country:"indian",permit:"yes",date:"1 Apr"},
+    {name:"Salman Hamaas",phone:"+60178691916",email:"salmanhamaas@gmail.com",position:"General Worker",city:"Kuala Terengganu",country:"malaysia",permit:"yes",date:"1 Apr"},
+    {name:"Lokman Habib Ruman",phone:"+601126264624",email:"lokmanhubibruman@gmail.com",position:"Housekeeping",city:"KL",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"Haruna Abdulahi Foy",phone:"+601141229776",email:"abdulahiharun5@gmail.com",position:"Telemarketing",city:"KL",country:"malaysia",permit:"yes",date:"1 Apr"},
+    {name:"Harry Harri",phone:"+917200366178",email:"137690430harryharry@gmail.com",position:"Storekeeper",city:"George Town",country:"indian",permit:"yes",date:"1 Apr"},
+    {name:"Kumar Kumar",phone:"+60182997546",email:"m24064479@gmail.com",position:"General Worker",city:"Klang",country:"indian",permit:"yes",date:"1 Apr"},
+    {name:"Babu Syal",phone:"+60182075496",email:"babuhossain241@gmail.com",position:"Renovation",city:"KL",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"Izzuddin bin Ismail",phone:"+60179090512",email:"izz.izudin99@gmail.com",position:"Courier",city:"Kelantan",country:"malaysia",permit:"yes",date:"1 Apr"},
+    {name:"Hafizur Rahman",phone:"+60192816435",email:"hafizurrahmandst1996@gmail.com",position:"Factory",city:"Muar",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"Shahidin Bin Mohamed",phone:"+60109840717",email:"shahidinmohamed@gmail.com",position:"Truck Driver",city:"Kulim",country:"malaysia",permit:"no",date:"1 Apr"},
+    {name:"Muhamad Aiee",phone:"+60142994332",email:"m.khairulnzrieee@gmail.com",position:"Loading/Unloading",city:"Muar",country:"malaysia",permit:"no",date:"1 Apr"},
+    {name:"Jitendra Gurung",phone:"+601117837524",email:"jitendragurung73@gmail.com",position:"Operator",city:"Johor",country:"nepal",permit:"yes",date:"1 Apr"},
+    {name:"Abhikrishnan",phone:"+916282099604",email:"abhikrishnan646@gmail.com",position:"Warehouse",city:"Shah Alam",country:"indian",permit:"no",date:"1 Apr"},
+    {name:"Santhi Ganesan",phone:"+60172374721",email:"angellinaharsinibibil@gmail.com",position:"General Worker",city:"Banting",country:"malaysia",permit:"no",date:"1 Apr"},
+    {name:"Sudip Tamang",phone:"+601121670673",email:"st5247104@gmail.com",position:"Working",city:"Shah Alam",country:"nepal",permit:"no",date:"1 Apr"},
+    {name:"Monir Reactor",phone:"+60122310114",email:"Mddmoner@gmail.com",position:"General Worker",city:"KL",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"FIKREE ALFANI",phone:"+60194220364",email:"fastfoodminicattering5116@gmail.com",position:"Services",city:"Selangor",country:"malaysia",permit:"no",date:"1 Apr"},
+    {name:"Azmi Abu Husin",phone:"+60133016519",email:"azmi1703@gmail.com",position:"Technician",city:"Kajang",country:"malaysia",permit:"no",date:"1 Apr"},
+    {name:"MONIR",phone:"+60166462110",email:"llemonir59@gmail.com",position:"Painter/Helper",city:"Penang",country:"bangladesh",permit:"no",date:"1 Apr"},
+    {name:"Deepak Kumar",phone:"+60134436546",email:"thakur.deepak1991@yahoo.com",position:"Labour",city:"Jalandhar",country:"indian",permit:"yes",date:"1 Apr"},
+    {name:"Chandan Chandan",phone:"+601117435794",email:"kumarchandan0197782949@gmail.com",position:"Store Work",city:"Janakpur",country:"nepal",permit:"yes",date:"1 Apr"},
+    {name:"Singh Amrit",phone:"+601126799002",email:"amritsidhu02488@gmail.com",position:"Loading",city:"Malaysia",country:"indian",permit:"yes",date:"1 Apr"},
+    {name:"Aman Aalam",phone:"+60102597641",email:"samiraalam231@gmail.com",position:"General Worker",city:"Putrajaya",country:"nepal",permit:"yes",date:"1 Apr"},
+    {name:"Altaf Husain",phone:"+917990440881",email:"altaf.khiyar786@gmail.com",position:"Loading/Unloading",city:"Dumra",country:"indian",permit:"no",date:"1 Apr"},
+    {name:"Raju Npl",phone:"+601129236376",email:"rajurokka8888@gmail.com",position:"General Worker",city:"Pokhara",country:"nepal",permit:"yes",date:"1 Apr"},
+    {name:"Mohammad Billal Hossain",phone:"+60138144712",email:"msbillalhossain00@gmail.com",position:"Loading",city:"Dhaka",country:"bangladesh",permit:"no",date:"1 Apr"},
+    {name:"Chandan Ray",phone:"+601136705735",email:"chandanrayrajput29@gmail.com",position:"Forklift Driver",city:"Serdang",country:"nepal",permit:"no",date:"1 Apr"},
+    {name:"Saiful Islam",phone:"+601124249308",email:"mdsaiful25126@gmail.com",position:"General Worker",city:"Klang",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"Jahid Hasan",phone:"+60143982198",email:"jh4583335@gmail.com",position:"General Worker",city:"Dhaka",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"zahid",phone:"+601131541665",email:"najmabegam170@gmail.com",position:"General Worker",city:"Selangor",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"Govind",phone:"+60149163163",email:"Govind207877@gamil.com",position:"Business",city:"Klang",country:"indian",permit:"no",date:"1 Apr"},
+    {name:"masud alam",phone:"+60143512863",email:"ddeeff103@gmail.com",position:"Forklift Driver",city:"Ipoh",country:"bangladesh",permit:"yes",date:"2 Apr"},
+    {name:"Sandeep Bhardwaj",phone:"+601141142850",email:"sandeeprj492@gmail.com",position:"Warehouse",city:"Gazipur",country:"indian",permit:"yes",date:"2 Apr"},
+    {name:"S M Rakibul Islam",phone:"+60167407426",email:"sabujmohdrakibulislam93@gmail.com",position:"General Worker",city:"Dhaka",country:"bangladesh",permit:"no",date:"2 Apr"},
+    {name:"Amila Nuwan",phone:"+60189141205",email:"nuwankumara4189@gmail.com",position:"Manufacture",city:"KL",country:"indian",permit:"no",date:"2 Apr"},
+    {name:"MD Jahangir Hossain",phone:"+60178398145",email:"mdjahangirhosain308@gmail.com",position:"General Worker",city:"Penang",country:"bangladesh",permit:"yes",date:"2 Apr"},
+    {name:"Chandra Titung Tamang",phone:"+9779869251468",email:"titungchandraman@gmail.com",position:"Factory",city:"Kavree",country:"nepal",permit:"yes",date:"2 Apr"},
+    {name:"Naveed Naveed",phone:"+60176445912",email:"redminew2973@gmail.com",position:"Loading/Unloading",city:"Sungai Patani",country:"indian",permit:"no",date:"2 Apr"},
+    {name:"Subash Kumar",phone:"+916387672944",email:"subhashkumar4689946@gmail.com",position:"Warehouse",city:"Salm",country:"indian",permit:"yes",date:"2 Apr"},
+    {name:"Sunny Sunny",phone:"+60178462120",email:"Sunnychopra2730@gmail.com",position:"Supervisor",city:"Amritsar",country:"indian",permit:"no",date:"2 Apr"},
+    {name:"Senthil Kumar",phone:"+919443620749",email:"senthil@gmail.com",position:"Driver",city:"Tamil Nadu",country:"indian",permit:"yes",date:"2 Apr"},
+    {name:"Mrp Mon",phone:"+60143647504",email:"paramaponchan@gmail.com",position:"General Worker",city:"Myanmar",country:"myanmar",permit:"yes",date:"2 Apr"},
+    {name:"Nujum Oddin",phone:"+60148482482",email:"nujumnujum564@gmail.com",position:"General Worker",city:"Kemaman",country:"bangladesh",permit:"yes",date:"2 Apr"},
+    {name:"Hemraj Kunwar",phone:"+601169946127",email:"himalkunwar720@gmail.com",position:"Material Handler",city:"Masai",country:"nepal",permit:"yes",date:"2 Apr"},
+    {name:"Sheikh Sabbir",phone:"+601121449283",email:"bl0894777@gmail.com",position:"General Worker",city:"Kedah",country:"bangladesh",permit:"yes",date:"2 Apr"},
+    {name:"Raikagerays Hokagerays",phone:"+60198957902",email:"raikagekaze@gmail.com",position:"Former",city:"Kota Kinabatangan",country:"malaysia",permit:"no",date:"2 Apr"},
+    {name:"Faredie Sidani Sampe",phone:"+60109025717",email:"farediesidanisampe173@gmail.com",position:"Manufacturing",city:"Kapar",country:"malaysia",permit:"no",date:"2 Apr"},
+    {name:"Tnasab Ramuk",phone:"+601128606483",email:"basantsunar292@gmail.com",position:"General Work",city:"Pyuthan",country:"nepal",permit:"yes",date:"2 Apr"},
+    {name:"Muhammad Ken",phone:"+60148947202",email:"muhammadken777@gmail.com",position:"Chef",city:"Kota Kinabalu",country:"malaysia",permit:"no",date:"2 Apr"},
+    {name:"Jasvinder",phone:"+60162170538",email:"jasvindersingh64686@gmail.com",position:"Warehouse",city:"Shah Alam",country:"indian",permit:"yes",date:"2 Apr"},
+    {name:"Md Ishanur Rahman",phone:"+60137883846",email:"mdishanurrahman3@gmail.com",position:"Computer Operating",city:"Selangor",country:"bangladesh",permit:"yes",date:"2 Apr"},
+    {name:"Muhammad Tareq",phone:"+18446377384",email:"mt1915977@gmail.com",position:"General Worker",city:"DN",country:"other",permit:"yes",date:"2 Apr"},
+    {name:"Arifin Sriwijaya",phone:"+601114642152",email:"rumahijo12345@gmail.com",position:"Factory",city:"Cilacap",country:"indonesia",permit:"yes",date:"3 Apr"},
+    {name:"JagDish Grg",phone:"+60162596800",email:"jagdishgrg07@gmail.com",position:"General Worker",city:"Selangor",country:"nepal",permit:"yes",date:"3 Apr"},
+    {name:"Bicky Das Kathbaniya",phone:"+60147596433",email:"bickybaniya67@gmail.com",position:"Machine Operator",city:"Penang",country:"nepal",permit:"yes",date:"3 Apr"},
+    {name:"Muhammad Shahidul Islam",phone:"+60143171371",email:"irfansajjat58@gmail.com",position:"Shop Supervisor",city:"Gelang Patah",country:"bangladesh",permit:"no",date:"3 Apr"},
+    {name:"Amin Ismail",phone:"+601161622461",email:"aminismail463@gmail.com",position:"Warden",city:"Bandar Tasik Mutiara",country:"malaysia",permit:"no",date:"3 Apr"},
+    {name:"Balmiki Neupane",phone:"+601128153298",email:"jumlakarnali44@gmail.com",position:"Cook",city:"JB",country:"nepal",permit:"yes",date:"3 Apr"},
+    {name:"Muhammad Danish",phone:"+601137706335",email:"drana9200@gmail.com",position:"General Worker",city:"Kampong Setol",country:"malaysia",permit:"yes",date:"3 Apr"},
+    {name:"Md Mahabub Sheikh",phone:"+8801675103830",email:"Mahabubsk3830@gmail.com",position:"Construction",city:"Dhaka",country:"bangladesh",permit:"yes",date:"3 Apr"},
+    {name:"Rajkumar Gupta",phone:"+601116413396",email:"ng6575540@gmail.com",position:"Store Keeper",city:"Sungai Petani",country:"nepal",permit:"yes",date:"3 Apr"},
+    {name:"Sharif Ahmmad",phone:"+60149956728",email:"ahmmadsharif562@gmail.com",position:"Worker",city:"Mymensingh",country:"bangladesh",permit:"yes",date:"4 Apr"},
+    {name:"Kyaw Lin Soe",phone:"+60177072190",email:"kyawlinsoekyaw1992@gmail.com",position:"General Worker",city:"Penang",country:"myanmar",permit:"yes",date:"4 Apr"},
+    {name:"Ajit H",phone:"+971502413601",email:"akmi.9591@gmail.com",position:"Forklift Driver",city:"Malaysia",country:"indian",permit:"yes",date:"4 Apr"},
+    {name:"Salleh Udin",phone:"+60166101235",email:"ajisaziz3000@gmail.com",position:"Operator",city:"Negeri Sembilan",country:"malaysia",permit:"yes",date:"4 Apr"},
+    {name:"RAM",phone:"+601135343446",email:"Rambagbull@gmail.com",position:"Truck Transport",city:"Klang",country:"malaysia",permit:"no",date:"4 Apr"},
+    {name:"MD AMDADUL HAQUE",phone:"+601131053691",email:"amdadahmed916@gmail.com",position:"General Worker",city:"Cheras",country:"bangladesh",permit:"yes",date:"4 Apr"},
+    {name:"Aman Shihab",phone:"+601164418480",email:"Amanshihab@gmail.com",position:"General Worker",city:"Penaga",country:"bangladesh",permit:"yes",date:"4 Apr"},
+    {name:"Ferdous Ahmed Razib",phone:"+60107121164",email:"kawsar1988.ak@gmail.com",position:"Private Service",city:"KL",country:"bangladesh",permit:"yes",date:"4 Apr"},
+    {name:"Ajaj Ansari",phone:"+60172645670",email:"aejajaejaj222@gmail.com",position:"Hotel Cleaner",city:"Janakpur",country:"nepal",permit:"yes",date:"4 Apr"},
+    {name:"Moloy Kormokar",phone:"+60183286714",email:"moloykormokar69@gmail.com",position:"Operator",city:"Klang",country:"bangladesh",permit:"yes",date:"4 Apr"}
+  ],
+  'Car Spare Parts': [
+    {name:"MOHD ROZI BIN ZAID",phone:"+60177449037",email:"mizitrgclubkj45@gmail.com",position:"General Worker",city:"Selangor",country:"malaysia",permit:"no",date:"19 Mar"},
+    {name:"mus",phone:"+601135025125",email:"muhammadramli6087@gmail.com",position:"Automotive",city:"Puchong",country:"malaysia",permit:"yes",date:"19 Mar"},
+    {name:"MDSANI BIN MDSAAD",phone:"+60123692930",email:"genglanuncoc@gmail.com",position:"Technician Painting",city:"Rawang",country:"malaysia",permit:"yes",date:"19 Mar"},
+    {name:"Mohamad haikal",phone:"+601135786675",email:"kinghaikal90@gmail.com",position:"General Worker",city:"Kuala Selangor",country:"malaysia",permit:"no",date:"19 Mar"},
+    {name:"Jagethish Viji",phone:"+601129905799",email:"jagethish511@gmail.com",position:"Car Parts",city:"Selangor",country:"indian",permit:"yes",date:"19 Mar"},
+    {name:"Salamat Ullah",phone:"+60135426831",email:"salamatullah252@gmail.com",position:"General Worker",city:"Selangor",country:"bangladesh",permit:"yes",date:"19 Mar"},
+    {name:"GE Suthan",phone:"+60182536492",email:"gesuthan1998@gmail.com",position:"QA Analyst",city:"Shah Alam",country:"indian",permit:"yes",date:"19 Mar"},
+    {name:"Praveen Ravindran",phone:"+60162351712",email:"mrveen@yahoo.com",position:"Automotive",city:"KL",country:"malaysia",permit:"no",date:"20 Mar"},
+    {name:"Inam Ianm",phone:"+94757278416",email:"abdulahb961@gmail.com",position:"Electrical Motor",city:"Colombo",country:"other",permit:"no",date:"20 Mar"},
+    {name:"Josh Sval",phone:"+60122145579",email:"techwrld.96@gmail.com",position:"Technician",city:"Klang",country:"malaysia",permit:"yes",date:"20 Mar"},
+    {name:"Md Arman Hossen",phone:"+60163127309",email:"armanhosen140@gmail.com",position:"Welder",city:"Telok Panglima Garang",country:"bangladesh",permit:"yes",date:"20 Mar"},
+    {name:"Syaiful Rizwan",phone:"+60104581181",email:"syaifulrizwanmriz@gmail.com",position:"Part Assistance",city:"Jitra",country:"malaysia",permit:"yes",date:"20 Mar"},
+    {name:"Nuraatika Sherizan",phone:"+601133629330",email:"boyrizan8880@gmail.com",position:"Store",city:"Kota Kinabalu",country:"malaysia",permit:"yes",date:"20 Mar"},
+    {name:"Adnan Abdul Aziz",phone:"+60173768341",email:"adnanabdulaziz1989@icloud.com",position:"Mechanics",city:"KL",country:"malaysia",permit:"no",date:"20 Mar"},
+    {name:"SADI Ahmed",phone:"+601139970951",email:"sunnyahmad8044@gmyail.com",position:"Teller Master",city:"KL",country:"bangladesh",permit:"no",date:"20 Mar"},
+    {name:"Khalekoj Jaman Zia",phone:"+601137491347",email:"khalekozzaman68@gmail.com",position:"Mechanic",city:"Kapar",country:"bangladesh",permit:"no",date:"20 Mar"},
+    {name:"Woafi Delower",phone:"+601164236180",email:"delowardelowar300@gmail.com",position:"Product Manager",city:"KL",country:"bangladesh",permit:"yes",date:"20 Mar"},
+    {name:"md Shawkat Osman",phone:"+8801816722386",email:"www.shawkat86@gmail.com",position:"Automobile",city:"Selangor",country:"bangladesh",permit:"yes",date:"20 Mar"},
+    {name:"MD Ibrahim Hossin",phone:"+601123058450",email:"mdibrahimhossin@gamil.com",position:"General Worker",city:"Dhaka",country:"bangladesh",permit:"yes",date:"20 Mar"},
+    {name:"SalimAhamad Salim",phone:"+60182387353",email:"salimahmmadsalim21@gmail.com",position:"Any Job",city:"KL",country:"bangladesh",permit:"yes",date:"20 Mar"},
+    {name:"Sheik Farid",phone:"+8801837160894",email:"sheikfarid222@gmail.com",position:"General Worker",city:"BD",country:"bangladesh",permit:"no",date:"20 Mar"},
+    {name:"Shihab Uddin Shihab",phone:"+601128518587",email:"shihabuddinshihab1620@gmail.com",position:"Worker",city:"Petaling Jaya",country:"bangladesh",permit:"no",date:"20 Mar"},
+    {name:"Balwinder Singh",phone:"+601139559890",email:"balwinderr8996@gmail.com",position:"HR and Marketing",city:"Petaling Jaya",country:"indian",permit:"yes",date:"21 Mar"},
+    {name:"Rambo Verma",phone:"+60105620688",email:"rambo.mrmmk@gmail.com",position:"Hard Working",city:"Kyauktaga",country:"indian",permit:"no",date:"21 Mar"},
+    {name:"Harun Rashid",phone:"+601126898779",email:"harunurashid2557@gmail.com",position:"General Worker",city:"Shah Alam",country:"bangladesh",permit:"no",date:"21 Mar"},
+    {name:"Tuk Bahadur Shrestha",phone:"+19803362589",email:"tekshrestha274@gmail.com",position:"Company Worker",city:"Kepung",country:"nepal",permit:"yes",date:"21 Mar"},
+    {name:"Ramesh Rana",phone:"+60173384229",email:"rameshjungrana1997@gmail.com",position:"Security Guard",city:"KL",country:"nepal",permit:"yes",date:"21 Mar"},
+    {name:"Milan Milan Acharya",phone:"+601170208135",email:"byrodacharya@gmail.com",position:"Worker",city:"New York",country:"nepal",permit:"no",date:"21 Mar"},
+    {name:"ALex Jung Chhetri",phone:"+601139422437",email:"chhetriashok6510@gmail.com",position:"Security Guard",city:"KL",country:"nepal",permit:"yes",date:"21 Mar"},
+    {name:"Govinda Shrestha",phone:"+60162643850",email:"durga81539@gmail.com",position:"Agriculture",city:"KL",country:"nepal",permit:"yes",date:"21 Mar"},
+    {name:"Ashok Shingdan",phone:"+601160857661",email:"ajatame5609@gmail.com",position:"Helper",city:"Jhapa",country:"nepal",permit:"yes",date:"21 Mar"},
+    {name:"Ammar B Shahi",phone:"+60175031318",email:"shahiamarb72@gmil.com",position:"Housekeeping",city:"Bukit Tambun",country:"malaysia",permit:"yes",date:"21 Mar"},
+    {name:"Arifulislam Saimon",phone:"+60147316462",email:"Saimonmd20@gmail.com",position:"Student",city:"KL",country:"bangladesh",permit:"no",date:"21 Mar"},
+    {name:"Md. Saiful Islam",phone:"+601112804606",email:"mdsaiefislam12000@gmail.com",position:"Store Keeper",city:"Dhaka",country:"bangladesh",permit:"no",date:"21 Mar"},
+    {name:"Sohel Islam",phone:"+60146618401",email:"sohelislam401@gmail.com",position:"General Worker",city:"KL",country:"bangladesh",permit:"no",date:"21 Mar"},
+    {name:"Iqbal Hassan",phone:"+60147632118",email:"mdiqbalhasanrabi@gmail.com",position:"Any",city:"KL",country:"bangladesh",permit:"yes",date:"21 Mar"},
+    {name:"ahamed sumon",phone:"+601116176704",email:"alisumon358@gmail.com",position:"Welder",city:"KL",country:"bangladesh",permit:"yes",date:"21 Mar"},
+    {name:"Jowel Rana",phone:"+60168314313",email:"jewelrana777666@gmail.com",position:"General Worker",city:"Shah Alam",country:"bangladesh",permit:"yes",date:"21 Mar"},
+    {name:"Nadeem Khan",phone:"+919648001029",email:"khannadeem99475@gmail.com",position:"General Worker",city:"Lucknow",country:"indian",permit:"yes",date:"21 Mar"},
+    {name:"Mohammad Mostafizur Rahman",phone:"+601133534186",email:"skshohel00767@gmail.com",position:"Internship",city:"Bagerhat",country:"bangladesh",permit:"yes",date:"21 Mar"},
+    {name:"Depan Thapa",phone:"+601126401252",email:"depanthapa94@gmail.com",position:"General Worker",city:"Kepong",country:"nepal",permit:"no",date:"21 Mar"},
+    {name:"Shamsul Islam",phone:"+60165220577",email:"01121075519ssffd@gmail.com",position:"Work Shop",city:"Jagannathpur",country:"bangladesh",permit:"yes",date:"22 Mar"},
+    {name:"Md Farid Uddin",phone:"+601111284841",email:"uddinhmfarid106@gmail.com",position:"Suitable",city:"KL",country:"bangladesh",permit:"yes",date:"22 Mar"},
+    {name:"Rakesh Rakesh",phone:"+60102123984",email:"yadhavr444@gmail.com",position:"Mechanic",city:"KL",country:"nepal",permit:"yes",date:"22 Mar"},
+    {name:"Habibullah Bahar",phone:"+60104397263",email:"habibullast@gmail.com",position:"Fruit Picker",city:"KL",country:"bangladesh",permit:"yes",date:"22 Mar"},
+    {name:"Hridoy Sheikh",phone:"+601136565941",email:"ridot65941@gmail.com",position:"Driving",city:"Malacca",country:"bangladesh",permit:"yes",date:"22 Mar"},
+    {name:"Deep Singh",phone:"+919878858319",email:"ramanjatt455@gmali.com",position:"Good",city:"Pathankot",country:"indian",permit:"no",date:"22 Mar"},
+    {name:"Ctgboy Bappu",phone:"+60142673818",email:"akyawwang880@gmail.com",position:"Forklift Driving",city:"KL",country:"bangladesh",permit:"no",date:"22 Mar"},
+    {name:"md nazmul islam",phone:"+60163058940",email:"jibon421@gmail.com",position:"Computer",city:"Dhaka",country:"bangladesh",permit:"yes",date:"22 Mar"},
+    {name:"Bhuwan Neupane",phone:"+9779849470245",email:"bhuwanneupane021@gmail.com",position:"Factory Worker",city:"Lalitpur",country:"nepal",permit:"yes",date:"22 Mar"},
+    {name:"Habibur Rahman",phone:"+60108866097",email:"hrhr6222@gmail.com",position:"Stoker",city:"Johor",country:"malaysia",permit:"yes",date:"28 Mar"},
+    {name:"Md Ikbel Hassan",phone:"+60186691924",email:"mdikbelhassan@gmail.com",position:"Worker",city:"JB",country:"bangladesh",permit:"no",date:"28 Mar"},
+    {name:"Satnam Singh",phone:"+60167566320",email:"Satnamsingh35355@gmail.com",position:"Any",city:"Ludhiana",country:"indian",permit:"yes",date:"28 Mar"},
+    {name:"Amitej Singh Sandhu",phone:"+60169325269",email:"amitej7@gmail.com",position:"Crane Operator",city:"Mentakab",country:"malaysia",permit:"no",date:"28 Mar"},
+    {name:"Dennes Crew",phone:"+601114103238",email:"dennes6887@gmail.com",position:"Spares Part",city:"Miri",country:"malaysia",permit:"no",date:"29 Mar"},
+    {name:"Iftekhar Al Mamun",phone:"+60182995436",email:"iftekhar81@gmail.com",position:"Data Entry/Warehouse",city:"Kajang",country:"bangladesh",permit:"yes",date:"29 Mar"},
+    {name:"Azzam Mustaffa",phone:"+60147902064",email:"heiiazzam91@gmail.com",position:"Anything",city:"Changlun",country:"malaysia",permit:"no",date:"29 Mar"},
+    {name:"Iman Hossain",phone:"+601141252076",email:"imanhossain010188@gmail.com",position:"Factory",city:"Batu Kawan",country:"bangladesh",permit:"yes",date:"29 Mar"},
+    {name:"ajit singh",phone:"+601175247356",email:"ajitsingh1169875245@gmail.com",position:"Retail",city:"Mau",country:"indian",permit:"yes",date:"29 Mar"},
+    {name:"Raihan Zahir",phone:"+60166365924",email:"zahirraihan2192@gmail.com",position:"General Worker",city:"Selangor",country:"bangladesh",permit:"no",date:"1 Apr"},
+    {name:"Alamin Mahamud Joy",phone:"+60149726037",email:"alamin178127@gmail.com",position:"Warehouse",city:"KL",country:"bangladesh",permit:"yes",date:"1 Apr"},
+    {name:"Sunil Limbu",phone:"+601127114212",email:"limbusunilll2025@gmail.com",position:"Marketing",city:"KL",country:"nepal",permit:"yes",date:"2 Apr"},
+    {name:"Habib Bhuiyan",phone:"+60179424407",email:"habibrm550@gmail.com",position:"General Worker",city:"KL",country:"bangladesh",permit:"no",date:"2 Apr"},
+    {name:"MD Rasel Mdrasel",phone:"+60146477725",email:"rmd532385@gmail.com",position:"General Worker",city:"Selangor",country:"bangladesh",permit:"yes",date:"2 Apr"},
+    {name:"Aaron Johnson",phone:"+601111801804",email:"aaronjohnsonaruna931023@gmail.com",position:"Mechanic",city:"Johor",country:"malaysia",permit:"yes",date:"2 Apr"},
+    {name:"Muhammad Shahidul Islam",phone:"+60143171371",email:"irfansajjat58@gmail.com",position:"Shop Supervisor",city:"Selangor",country:"bangladesh",permit:"yes",date:"3 Apr"},
+    {name:"Md Abu Bakker",phone:"+60178905019",email:"defa28293@gmail.com",position:"General Worker",city:"KL",country:"bangladesh",permit:"yes",date:"3 Apr"},
+    {name:"Akshay Kumar Singh",phone:"+60182825619",email:"akshay.singh143456@gmail.com",position:"General Worker",city:"Birgunj",country:"nepal",permit:"yes",date:"4 Apr"}
+  ],
+  'Kitchen & Hospitality': [
+    {name:"ARIF",phone:"+60143479823",email:"",position:"Kitchen Helper",city:"KL",country:"bangladesh",permit:""},
+    {name:"HIRA BAHADUR",phone:"+601172382128",email:"",position:"Kitchen Helper",city:"KL",country:"nepal",permit:""},
+    {name:"SHATRUDHAN",phone:"+9779818720581",email:"",position:"Kitchen Helper",city:"Banting",country:"nepal",permit:""},
+    {name:"Kotha Meraz",phone:"+60192508575",email:"kothameraz@gmail.com",position:"Cashier",city:"KL",country:"bangladesh",permit:""},
+    {name:"Amdadul Haque",phone:"+601131053691",email:"amdadulhaque011333@gmail.com",position:"Kitchen Crew",city:"Cheras",country:"bangladesh",permit:""},
+    {name:"Sabbir Ahmed",phone:"+60134518710",email:"sabmisha01@gmail.com",position:"Kitchen Crew",city:"KL",country:"bangladesh",permit:""},
+    {name:"raju pariyar",phone:"+601137418609",email:"rajudhabha49@gmail.com",position:"Waiter",city:"Kathmandu",country:"nepal",permit:""},
+    {name:"md.kamruzzaman",phone:"+8801175338277",email:"kamruzzaman1482@gmail.com",position:"Cashier",city:"KL",country:"bangladesh",permit:""},
+    {name:"Raihan Zahir",phone:"+60166365924",email:"zahirraihan2192@gmail.com",position:"Waiter",city:"Selangor",country:"bangladesh",permit:""},
+    {name:"Dipendra gurung",phone:"+60128082813",email:"dipendra78@gmail.com",position:"Dishwasher",city:"Petaling Jaya",country:"nepal",permit:""},
+    {name:"Prakash Ghosh",phone:"+919609231645",email:"pinkighosh@gmail.com",position:"Chef/Cook",city:"Kolkata",country:"indian",permit:""},
+    {name:"MD Earshad Hossain",phone:"+601129902495",email:"ahamadearshad68@gmail.com",position:"Waiter",city:"Dhaka",country:"bangladesh",permit:""},
+    {name:"Sahabir Sunar",phone:"+9779865601675",email:"sahabirsunar69@gmail.com",position:"Assistant",city:"Surkhet",country:"nepal",permit:""},
+    {name:"New Akbar Travels",phone:"+60173489563",email:"rs.globalmalaysia@gmail.com",position:"Chef/Cook",city:"Kolkata",country:"indian",permit:""},
+    {name:"Dibya Jyoti Chakma",phone:"+601111748163",email:"dibyajyotichakma1234@gmail.com",position:"Chef/Cook",city:"Malaysia",country:"bangladesh",permit:""},
+    {name:"Mohammad Foisal",phone:"+601121377934",email:"ahmedfoisal41@gmail.com",position:"Chef/Cook",city:"Kajang",country:"bangladesh",permit:""},
+    {name:"Gautam Arora",phone:"+917696056503",email:"goutamarora1989@gmail.com",position:"Waiter",city:"Tarn Taran",country:"indian",permit:""},
+    {name:"Alisha Yaqoob",phone:"+601161839018",email:"Alishayaqoob55@gmail.com",position:"Kitchen Crew",city:"KL",country:"bangladesh",permit:""},
+    {name:"Mohammadul Hoque",phone:"+601139318145",email:"mdhoque264970@gmail.com",position:"Waiter",city:"Putrajaya",country:"bangladesh",permit:""},
+    {name:"Arifur Rahman",phone:"+601116564667",email:"arifur704@gmail.com",position:"Waiter",city:"Shah Alam",country:"bangladesh",permit:""},
+    {name:"Sanjay Dutt Lasiyal",phone:"+918195814856",email:"sduttlasiyal@gmail.com",position:"Chef/Cook",city:"Chandigarh",country:"indian",permit:""},
+    {name:"Muhammad Supan",phone:"+8801167001879",email:"masufan491@gmail.com",position:"Cashier",city:"Sunamganj",country:"bangladesh",permit:""},
+    {name:"Nahian noor orin",phone:"+60162717160",email:"sifatnur846@gmail.com",position:"Waiter",city:"KL",country:"bangladesh",permit:""},
+    {name:"Md Ishaq",phone:"+60142257050",email:"mdishaqhasan1995@gmail.com",position:"Chef/Cook",city:"KL",country:"bangladesh",permit:""},
+    {name:"Mansur Alam",phone:"+601125262350",email:"bijoy000012345@gmail.com",position:"Waiter",city:"KL",country:"bangladesh",permit:""},
+    {name:"MD Ismail Hossain",phone:"+60106637813",email:"akashkhan8334@gmail.com",position:"Waiter",city:"KL",country:"bangladesh",permit:""},
+    {name:"Md shohag mia",phone:"+60172588641",email:"mdshohag88641@gmail.com",position:"Waiter",city:"KL",country:"bangladesh",permit:""},
+    {name:"Md Mamun",phone:"+60178594618",email:"joymamun1989@gmail.com",position:"Waiter",city:"Narayanganj",country:"bangladesh",permit:""},
+    {name:"Ensan Sharif",phone:"+60187687650",email:"ensansharif04@gmail.com",position:"Chef/Cook",city:"KL",country:"bangladesh",permit:""},
+    {name:"Sham Andy",phone:"+601133842402",email:"shawn21041990@gmail.com",position:"Chef/Cook",city:"Penang",country:"malaysia",permit:""},
+    {name:"shohag",phone:"+6062574979",email:"mr.shohag15@gmail.com",position:"Chef/Cook",city:"Shah Alam",country:"bangladesh",permit:""},
+    {name:"Bigyan Lal Tamang",phone:"+601137278398",email:"bigyantmg045@gmail.com",position:"Waiter",city:"KL",country:"nepal",permit:""},
+    {name:"MH Hridoy",phone:"+60178641922",email:"hridoy.kh32@gmail.com",position:"Waiter",city:"Petaling Jaya",country:"bangladesh",permit:""},
+    {name:"Kumar Tamang",phone:"+60189660687",email:"kumartamang9257@gmail.com",position:"Chef/Cook",city:"KL",country:"nepal",permit:""},
+    {name:"EHSAN SHARIF",phone:"+601161209165",email:"",position:"Chef/Cook",city:"",country:"bangladesh",permit:""},
+    {name:"ARSHAN",phone:"+60166818423",email:"",position:"Waiter",city:"",country:"other",permit:""},
+    {name:"MG PAGE PHYO",phone:"+60167281792",email:"",position:"Waiter",city:"",country:"myanmar",permit:""},
+    {name:"KHURSHAID ZARIN",phone:"+923429761908",email:"",position:"Waiter",city:"",country:"other",permit:""},
+    {name:"DIPAK CHANDRA",phone:"+60108821415",email:"",position:"Waiter",city:"",country:"indian",permit:""},
+    {name:"MUHMMAD HASEEB",phone:"+923081648331",email:"",position:"Waiter",city:"",country:"other",permit:""},
+    {name:"AZIZUL HAQUE",phone:"+8801615659882",email:"",position:"Waiter",city:"",country:"bangladesh",permit:""},
+    {name:"UMAR",phone:"+601128622427",email:"",position:"Waiter",city:"",country:"other",permit:""},
+    {name:"DIBYA JYOTI",phone:"+60109130245",email:"",position:"Waiter",city:"",country:"other",permit:""},
+    {name:"MD SORFE",phone:"+60197134792",email:"",position:"Chef/Cook",city:"Myanmar",country:"myanmar",permit:""},
+    {name:"MD FARID",phone:"+60177622961",email:"",position:"Waiter",city:"Indonesia",country:"indonesia",permit:""},
+    {name:"MOHD KHIRUL IMRAN",phone:"+60173022938",email:"",position:"Waiter",city:"Pakistan",country:"other",permit:""},
+    {name:"ARISWARAN",phone:"+6017498967",email:"",position:"Waiter",city:"",country:"indian",permit:""},
+    {name:"Rang Ren",phone:"+601128590530",email:"renmang3150@gmail.com",position:"Kitchen Crew",city:"Petaling Jaya",country:"myanmar",permit:""},
+    {name:"Muz Mohsin",phone:"+60162441383",email:"muzmohsin41@gmail.com",position:"Waiter",city:"KL",country:"bangladesh",permit:""},
+    {name:"Peter Khai",phone:"+601121137933",email:"peterkhai7471@gmail.com",position:"Chef/Cook",city:"Kepong",country:"myanmar",permit:""},
+    {name:"Mohammad farid bin mokhtar",phone:"+60177622961",email:"mohdfaridbinmokhtaryed@gmail.com",position:"Dishwasher",city:"Selayang",country:"malaysia",permit:""},
+    {name:"Alya Humaira",phone:"+6287881307999",email:"nurzumma082@gmail.com",position:"Waiter",city:"Binjai",country:"indonesia",permit:""},
+    {name:"Ash Garcia",phone:"+601111737869",email:"ashgarcialoyola@gmail.com",position:"Chef/Cook",city:"Philippines",country:"other",permit:""},
+    {name:"Akram Alrahaal",phone:"+601111673886",email:"asmmariraqi@yahoo.com",position:"Cashier",city:"KL",country:"other",permit:""},
+    {name:"Azlan Shah Lan",phone:"+60194395429",email:"azlanzshahlanz2@gmail.com",position:"Dishwasher",city:"Ampang",country:"malaysia",permit:""},
+    {name:"Sagar Sarker",phone:"+601127074178",email:"sagarsarker308@gmail.com",position:"Waiter",city:"Petaling Jaya",country:"bangladesh",permit:""},
+    {name:"Qaisar Abbas Qazalbash",phone:"+60102096279",email:"qaqazalbash@gmail.com",position:"Waiter",city:"KL",country:"other",permit:""},
+    {name:"Paa Kap",phone:"+60147131513",email:"kappyi08@gmail.com",position:"Waiter",city:"Petaling Jaya",country:"myanmar",permit:""},
+    {name:"Ahmed Juned",phone:"+60169826730",email:"ahmedjunedredmi@gmail.com",position:"Chef/Cook",city:"KL",country:"bangladesh",permit:""},
+    {name:"YUSRI ASLIM",phone:"+60189413259",email:"yusribinaslim@gmail.com",position:"Kitchen Crew",city:"KL",country:"malaysia",permit:""},
+    {name:"Krisna Murti",phone:"+601162041438",email:"krisnamurti101097@gmail.com",position:"Cashier",city:"Malaysia",country:"indonesia",permit:""},
+    {name:"Gopi Nath",phone:"+601160834904",email:"gg6477253@gmail.com",position:"Waiter",city:"Puchong",country:"indian",permit:""},
+    {name:"B.Gopan",phone:"+94764207166",email:"banuthanu760@gmail.com",position:"Cashier",city:"Batticaloa",country:"other",permit:""},
+    {name:"Mohamed Sultan",phone:"+601120847862",email:"mohdsultanshariff@gmail.com",position:"Dishwasher",city:"KL",country:"malaysia",permit:""},
+    {name:"YUSRI",phone:"+60183849958",email:"",position:"Hotel",city:"KL",country:"malaysia",permit:""},
+    {name:"Thu Rein",phone:"+601161788638",email:"",position:"Hotel",city:"",country:"myanmar",permit:""},
+    {name:"Shirley demetillo",phone:"+639452268588",email:"",position:"Waiter",city:"",country:"other",permit:""},
+    {name:"ADITYADIKI",phone:"+6287859181570",email:"",position:"Waiter",city:"",country:"other",permit:""},
+    {name:"DIVESH KUMAR",phone:"+601172672158",email:"",position:"Waiter",city:"",country:"indian",permit:""},
+    {name:"DUTHAI",phone:"+601111077987",email:"",position:"Waiter",city:"",country:"other",permit:""},
+    {name:"ADITYA",phone:"+601164511049",email:"",position:"Waitress",city:"KL",country:"indian",permit:""},
+    {name:"HONG HARN JIAN",phone:"+60164475125",email:"",position:"Chef",city:"Kedah",country:"malaysia",permit:""},
+    {name:"Sumathi Naidu",phone:"+60124155037",email:"sumathinaidu83@gmail.com",position:"Chef/Cook",city:"",country:"indian",permit:""},
+    {name:"Demetillo Shierly",phone:"+639271449426",email:"Demetilloshierly@gmail.com",position:"Dishwasher",city:"",country:"other",permit:""},
+    {name:"Shahada bt noor mohamd",phone:"+60128433073",email:"emirshah30@gmail.com",position:"Kitchen Crew",city:"",country:"malaysia",permit:""},
+    {name:"Thang suan hang",phone:"+601128806913",email:"thangsuantungnung@gmail.com",position:"Chef/Cook",city:"",country:"myanmar",permit:""},
+    {name:"sawal munandar",phone:"+601112713704",email:"sawalmunandar21@gmail.com",position:"Chef/Cook",city:"",country:"indonesia",permit:""},
+    {name:"Lalmuana Malay",phone:"+60199093129",email:"muanavartelallungmuanavarte@gmail.com",position:"Kitchen Crew",city:"",country:"myanmar",permit:""},
+    {name:"Alagen Gendra",phone:"+60163891351",email:"alagenkughan@gmail.com",position:"Waiter",city:"KL",country:"indian",permit:""},
+    {name:"Fandy",phone:"+60198466788",email:"fandynuh@gmail.com",position:"Assistant",city:"",country:"malaysia",permit:""},
+    {name:"Don Garmanit",phone:"+60183167043",email:"sovviayeni@gmail.com",position:"F&B Management",city:"",country:"other",permit:""},
+    {name:"Yeni Soviawati",phone:"+60148504836",email:"thawndeihpiang354@gmail.com",position:"Kitchen",city:"Petaling Jaya",country:"indonesia",permit:""},
+    {name:"TD Piang",phone:"+60182400511",email:"myothandarkyaw87@gmail.com",position:"Dishwasher",city:"Ampang",country:"myanmar",permit:""},
+    {name:"Aye ko",phone:"+601127162774",email:"dhafiyazid2@gmail.com",position:"Kitchen Crew",city:"Johor",country:"myanmar",permit:""},
+    {name:"Lala Ozil",phone:"+60183977769",email:"asiffrabb23@gmail.com",position:"Pasar Malam",city:"Ampang",country:"bangladesh",permit:""},
+    {name:"Asif RahRahman",phone:"+60135430625",email:"sanniwale761@gmail.com",position:"Manager",city:"Dhaka",country:"bangladesh",permit:""},
+    {name:"olawale sanni",phone:"+60166124738",email:"sianpi083@gmail.com",position:"Waiter",city:"KL",country:"other",permit:""},
+    {name:"Sian Pi",phone:"+601121240393",email:"rifatahamed066@gmail.com",position:"Hotel F&B",city:"KL",country:"other",permit:""},
+    {name:"Rifat Ahmed",phone:"+8801737354779",email:"zulhafizifarah1964@gmail.com",position:"Studying",city:"KL",country:"bangladesh",permit:""},
+    {name:"Muhammad Zul Hafizi",phone:"+60173449064",email:"",position:"Commis",city:"Kuala Selangor",country:"malaysia",permit:""},
+    {name:"AMINU",phone:"+601161136683",email:"",position:"Waiter",city:"Johor",country:"other",permit:""},
+    {name:"Eden TC",phone:"+959258550621",email:"edentc1995@gmail.com",position:"Kitchen Helper",city:"KL",country:"myanmar",permit:""},
+    {name:"Riqie Aswan",phone:"+601114597559",email:"Rickybozes@gmail.com",position:"Barista",city:"KL",country:"malaysia",permit:""},
+    {name:"Fernando",phone:"+6289503348852",email:"fernandohuang232@gmail.com",position:"Clerk",city:"Palembang",country:"indonesia",permit:""},
+    {name:"Oriana Wulandari",phone:"+60174721808",email:"ria42413@gmail.com",position:"Cleaner",city:"Pusing",country:"indonesia",permit:""},
+    {name:"Mohd Ali",phone:"+60162528511",email:"order@medigreen.my",position:"Supervisor",city:"Ampang",country:"malaysia",permit:""},
+    {name:"Sanjoy Biswas",phone:"+918609437105",email:"sanjoybiswas762@gmail.com",position:"Chef",city:"Gede",country:"indian",permit:""},
+    {name:"Mskumar Shetty",phone:"+919600852114",email:"mskumarshetty1980@gmail.com",position:"SABIC",city:"Dammam",country:"indian",permit:""},
+    {name:"Nizam Nizam",phone:"+601157527954",email:"azamnizam1726@gmail.com",position:"Cook",city:"Kajang",country:"malaysia",permit:""},
+    {name:"Ammad Fayyaz",phone:"+601128701983",email:"ammadfayyaz88@gmail.com",position:"Waiter",city:"Kulai",country:"other",permit:""},
+    {name:"Siti Norshilla Mat Isa",phone:"+60183936044",email:"sitinorshillamatisa@gmail.com",position:"Kitchen Crew",city:"Ampang",country:"malaysia",permit:""},
+    {name:"ALVIN GIRALDY",phone:"+60182994087",email:"syahirahhaszaham@gmail.com",position:"Crew",city:"Puchong",country:"malaysia",permit:""},
+    {name:"Amar Bajuri",phone:"+60183283032",email:"amarmustopa566@gmail.com",position:"Superintendent",city:"KL",country:"malaysia",permit:""},
+    {name:"Babara Susan Pereira",phone:"+60123965041",email:"Babarapereira1959@gmail.com",position:"Fruit Pickers",city:"Selangor",country:"malaysia",permit:""},
+    {name:"Fitri",phone:"+60196423942",email:"FitriHassan1998@gmail.com",position:"Chef",city:"Rawang",country:"malaysia",permit:""},
+    {name:"Muzammil Amir",phone:"+60143219879",email:"amirzuhudimuzammilamir@gmail.com",position:"BBQ Sous Chef",city:"Batu Caves",country:"malaysia",permit:""},
+    {name:"Aira Afiz Zra",phone:"+60186675712",email:"zulianaroza328@yahoo.com",position:"Assistant",city:"Klang",country:"malaysia",permit:""},
+    {name:"Meghu",phone:"+60165670169",email:"Megarubanie@icloud.com",position:"Work",city:"Shah Alam",country:"indian",permit:""},
+    {name:"Dedi Syahputra",phone:"+60103604194",email:"chandraalkky@gmail.com",position:"Memasak",city:"KL",country:"indonesia",permit:""},
+    {name:"Sefan Alfyanda",phone:"+601172541897",email:"ialfaris541@gmail.com",position:"Barista/Cashier/Waiter",city:"Selangor",country:"indonesia",permit:""},
+    {name:"Rawi Chandra",phone:"+62177442702",email:"rawichandra777@gmail.com",position:"Bisnis Kuliner",city:"Pahang",country:"indonesia",permit:""},
+    {name:"Kitchen Crew",phone:"+601167881005",email:"lemanenjoy681@gmail.com",position:"Kitchen Crew",city:"KL",country:"malaysia",permit:""},
+    {name:"Lisan Huang",phone:"+60127519321",email:"lisan2933@gmail.com",position:"General Worker",city:"KL",country:"malaysia",permit:""},
+    {name:"Gunaselvy Gunasegaran",phone:"+60106612055",email:"gunaselvygunasegaran89@gmail.com",position:"Cashier",city:"Nilai",country:"indian",permit:""},
+    {name:"Malik Zain Ul Abideen",phone:"+601111973788",email:"ulabidin100@gmail.com",position:"Waiter",city:"Chow Kit",country:"other",permit:""},
+    {name:"Jhore Pora Srabon",phone:"+8801761228422",email:"sumonmalaysha5@gmil.com",position:"Kitchen Crew",city:"Kulim",country:"bangladesh",permit:""},
+    {name:"Abdullah Al Mahmud",phone:"+60162294220",email:"shimanto.mash@gmail.com",position:"Floor Supervisor",city:"Penang",country:"bangladesh",permit:""},
+    {name:"V Kim",phone:"+601163660245",email:"mungkim043@gmail.com",position:"Restaurant",city:"Petaling Jaya",country:"myanmar",permit:""},
+    {name:"Alex Carasco",phone:"+60179563525",email:"bekkenber@gmail.com",position:"Kitchen Crew",city:"Subang Jaya",country:"other",permit:""},
+    {name:"PETER",phone:"+60182339704",email:"",position:"Chef",city:"Subang",country:"malaysia",permit:""},
+    {name:"MOCHAMAD ALVIN GRADLY",phone:"+60193605385",email:"",position:"Waiter",city:"",country:"indonesia",permit:""},
+    {name:"shaqib",phone:"+60175977104",email:"",position:"Kitchen",city:"",country:"malaysia",permit:""},
+    {name:"Tham soon hing",phone:"+601111534508",email:"soonhingtham@gmail.com",position:"Kitchen Chef",city:"KL",country:"malaysia",permit:""},
+    {name:"Naing Lin",phone:"+601128992345",email:"lin355526@gmail.com",position:"General Worker",city:"KL",country:"myanmar",permit:""},
+    {name:"Kayathry",phone:"+60179543085",email:"kayathry3086@gmail.com",position:"Suami Kerja",city:"Sungai Buloh",country:"indian",permit:""},
+    {name:"Haziq Maula Bajuri",phone:"+60162068081",email:"zeeqco@gmail.com",position:"Worker",city:"Shah Alam",country:"malaysia",permit:""},
+    {name:"Abduel Arief",phone:"+601128660097",email:"Arifyuhuu025@gmail.com",position:"Kitchen Crew",city:"KL",country:"indonesia",permit:""},
+    {name:"Malar Desha Dsp",phone:"+60184031789",email:"tlatchamanan@gmail.com",position:"Full Time",city:"Shah Alam",country:"indian",permit:""},
+    {name:"Annamary Anthony",phone:"+60179132086",email:"annamaryanthony86@gmail.com",position:"Kitchen Crew",city:"Selayang",country:"malaysia",permit:""},
+    {name:"Babu Sheak",phone:"+601116799950",email:"babusheak70@gmail.com",position:"Kitchen Crew",city:"KL",country:"bangladesh",permit:"",date:"1 Apr"},
+    {name:"Nasifudin",phone:"+601139467551",email:"tiosshit@gmail.com",position:"Waiter/Bartender",city:"Jakarta",country:"indonesia",permit:"",date:"1 Apr"},
+    {name:"Wika Indah",phone:"+60168151756",email:"wahyu86ika@gmail.com",position:"Kitchen Crew",city:"KL",country:"indonesia",permit:"",date:"1 Apr"},
+    {name:"Ivani Annisa",phone:"+60175344240",email:"linggabink@gmail.com",position:"Waiter",city:"Bandung",country:"indonesia",permit:"",date:"1 Apr"},
+    {name:"Wiwin Ayu",phone:"+60173506134",email:"wiwin.mdali@gmail.com",position:"Kitchen Crew",city:"Puchong",country:"indonesia",permit:"",date:"1 Apr"},
+    {name:"Anamul Hasan",phone:"+60108289385",email:"hasananamul666@gmail.com",position:"Manpower",city:"KL",country:"bangladesh",permit:"",date:"1 Apr"},
+    {name:"Ali Rustam",phone:"+601136852757",email:"rustamali19870@gmail.com",position:"Hotel",city:"KL",country:"other",permit:"",date:"2 Apr"},
+    {name:"Ramina Rina",phone:"+60196038707",email:"rinarinar492@gmail.com",position:"Kitchen",city:"KL",country:"other",permit:"",date:"2 Apr"},
+    {name:"Chandra",phone:"+601128118744",email:"candra90can@gmail.com",position:"Operator Kilang",city:"KL",country:"other",permit:"",date:"2 Apr"},
+    {name:"Daynish Hafizudin",phone:"+601137989848",email:"daynish33@gmail.com",position:"Dishwasher",city:"Puchong",country:"malaysia",permit:"",date:"2 Apr"},
+    {name:"Ko Zaw",phone:"+60183545968",email:"waiyan5110776@gmail.com",position:"Kitchen",city:"KL",country:"myanmar",permit:"",date:"2 Apr"},
+    {name:"Gulhan Ravi Khan",phone:"+601126632708",email:"gulhanravikhan@gmail.com",position:"Manager",city:"KL",country:"other",permit:"",date:"2 Apr"},
+    {name:"Hidayah Eskandar",phone:"+60124419209",email:"yaya.eskandar96@gmail.com",position:"Kitchen Crew",city:"KL",country:"malaysia",permit:"",date:"2 Apr"},
+    {name:"Tika Ariska Putri",phone:"+60104111216",email:"ariska.cha30@gmail.com",position:"Cashier",city:"Malaysia",country:"indonesia",permit:"",date:"2 Apr"},
+    {name:"Andy Khaw",phone:"+60193448026",email:"andykhaw83@gmail.com",position:"Customer Service",city:"Subang Jaya",country:"malaysia",permit:"",date:"2 Apr"},
+    {name:"Rosnita Akma Roslee",phone:"+60122726719",email:"akmazalimadanish@gmail.com",position:"Kitchen Crew",city:"Shah Alam",country:"malaysia",permit:"",date:"2 Apr"},
+    {name:"Thanalekchumi",phone:"+60196967167",email:"nantha1475@gmail.com",position:"Supervisor",city:"Petaling Jaya",country:"indian",permit:"",date:"2 Apr"},
+    {name:"Muhammad Hamzan",phone:"+60176835886",email:"hamzanudin990@gmail.com",position:"Waiter",city:"Shah Alam",country:"malaysia",permit:"",date:"2 Apr"},
+    {name:"Septiana Nurjanah",phone:"+601169950093",email:"septiananurjanah2@gmail.com",position:"Cashier",city:"Batu Pahat",country:"indonesia",permit:"",date:"2 Apr"},
+    {name:"Atul Tomar",phone:"+919015130069",email:"atultomarstn@gmail.com",position:"Chef",city:"Simour",country:"indian",permit:"",date:"2 Apr"},
+    {name:"Elisa Wati",phone:"+60185928767",email:"watielisa320@gmail.com",position:"Dishwasher",city:"Kediri",country:"indonesia",permit:"",date:"2 Apr"},
+    {name:"Shila Abduljalil",phone:"+60162786580",email:"Ajalilshila@gmail.com",position:"Steward",city:"KL",country:"malaysia",permit:"",date:"2 Apr"},
+    {name:"Santosh Yadav",phone:"+60147126980",email:"sy3259482@gmail.com",position:"Kitchen Helper",city:"Malacca",country:"nepal",permit:"",date:"2 Apr"},
+    {name:"Thang Khan Kim",phone:"+601137194749",email:"thangkhankim579@gmail.com",position:"Cook Crew",city:"Myanmar",country:"myanmar",permit:"",date:"2 Apr"},
+    {name:"Rudro S. Hasan",phone:"+60177538332",email:"hasanrudro419@gmail.com",position:"Waiter",city:"KL",country:"bangladesh",permit:"",date:"2 Apr"},
+    {name:"Muhammad Fadlii",phone:"+60109107060",email:"mnfadli75@gmail.com",position:"Waiter",city:"Lumajang",country:"indonesia",permit:"",date:"2 Apr"},
+    {name:"Serrano Jenifer",phone:"+601125098726",email:"maningasserranojhen@gmail.com",position:"Waitress",city:"Bay",country:"other",permit:"",date:"2 Apr"},
+    {name:"Md Niem Hossain",phone:"+601119955725",email:"niemm589@gmail.com",position:"Greenhouse",city:"Malacca",country:"bangladesh",permit:"",date:"2 Apr"},
+    {name:"Yuli Imeliani",phone:"+60167216529",email:"uliimeliani@gmail.com",position:"Commis",city:"KL",country:"indonesia",permit:"",date:"3 Apr"},
+    {name:"simran",phone:"+60146350522",email:"simu06534@gmail.com",position:"Service",city:"Penang",country:"indian",permit:"",date:"3 Apr"},
+    {name:"Atta Ul Awwal",phone:"+601111613248",email:"flychef20@gmail.com",position:"Chef",city:"KL",country:"other",permit:"",date:"3 Apr"},
+    {name:"NIANGSIANZAM",phone:"+60183639512",email:"estherzamboih@gmail.com",position:"Cashier",city:"Malaysia",country:"myanmar",permit:"",date:"3 Apr"},
+    {name:"Angelin Magdaong",phone:"+601160811008",email:"angelinmagdaon@gmail.com",position:"Dishwasher",city:"KL",country:"other",permit:"",date:"3 Apr"},
+    {name:"Akeem Adisa",phone:"+601127194463",email:"adisaakeem5678@gmail.com",position:"Dishwasher",city:"Lagos",country:"other",permit:"",date:"3 Apr"},
+    {name:"Min Thein",phone:"+601137973609",email:"mintnein4@gmail.com",position:"Kitchen",city:"KL",country:"myanmar",permit:"",date:"3 Apr"},
+    {name:"Sitimuflikhab",phone:"+60175117843",email:"handiismanto140@gmail.com",position:"Waitress",city:"Senai JB",country:"indonesia",permit:"",date:"3 Apr"},
+    {name:"Wahyu Utami",phone:"+60102778001",email:"wahyuutamiarisanti1983@gmail.com",position:"Cleaner",city:"Bukit Jalil",country:"indonesia",permit:"",date:"3 Apr"},
+    {name:"Linda Seng",phone:"+60108949097",email:"lindaseng08@gmail.com",position:"General Worker",city:"Seri Kembangan",country:"malaysia",permit:"",date:"3 Apr"},
+    {name:"Masdalena",phone:"+60149139262",email:"masdalenaritonga56@gmail.com",position:"Cashier",city:"Malacca",country:"indonesia",permit:"",date:"3 Apr"},
+    {name:"Faizan Husyairie",phone:"+60172204655",email:"faizanhusyairie9@gmail.com",position:"F&B",city:"Sepang",country:"malaysia",permit:"",date:"3 Apr"},
+    {name:"Akmar Mohamed Noor",phone:"+60129231271",email:"raddja67@gmail.com",position:"Dishwasher",city:"Petaling Jaya",country:"malaysia",permit:"",date:"3 Apr"},
+    {name:"Grace Grace",phone:"+601126330295",email:"hemagrace95@gmail.com",position:"Clerical Admin",city:"Selangor",country:"malaysia",permit:"",date:"3 Apr"},
+    {name:"Khairul Naim",phone:"+601115196580",email:"Naimkhairul970@gmail.com",position:"Kitchen Crew",city:"Selangor",country:"malaysia",permit:"",date:"4 Apr"},
+    {name:"Audrey Daniya",phone:"+60126000218",email:"daniyaaudrey@gmail.com",position:"Chef/Line Cook",city:"Subang Jaya",country:"malaysia",permit:"",date:"4 Apr"},
+    {name:"Ali Raza",phone:"+601170183063",email:"ia6333316@gmail.com",position:"Head Chef",city:"Johor Bahru",country:"other",permit:"",date:"4 Apr"},
+    {name:"TunLin Naing",phone:"+601125323450",email:"tunlinnaing255@gmail.com",position:"Kitchen Crew",city:"Shah Alam",country:"myanmar",permit:"",date:"4 Apr"},
+    {name:"Limon Baher",phone:"+60189723390",email:"infinityworld050@gmail.com",position:"Waiter",city:"Subang Jaya",country:"bangladesh",permit:"",date:"4 Apr"},
+    {name:"Nasrul Ahmad",phone:"+60189865773",email:"teammorosilvena@gmail.com",position:"Waiter",city:"Kuala Langat",country:"malaysia",permit:"",date:"4 Apr"}
+  ],
+  'General Workers': [
+    {name:"Md Robiul",phone:"+601164042580",email:"28099301robiul@gmail.com",position:"General Worker",city:"Klang",country:"bangladesh",permit:""},
+    {name:"mal",phone:"+60194940620",email:"akmal0561@gmail.com",position:"Real Estate Agent",city:"Kluang",country:"malaysia",permit:""},
+    {name:"Benny Selva",phone:"+601137578105",email:"bennyselva5001@gmail.com",position:"General Worker",city:"PJ",country:"indian",permit:""},
+    {name:"Nazrol Aripin",phone:"+601130069731",email:"nazrolshamsuddin52@gmail.com",position:"General Worker",city:"Subang Jaya",country:"malaysia",permit:""},
+    {name:"Abd Fd",phone:"+60108073433",email:"nikfadlullah19@gmail.com",position:"Operator",city:"Shah Alam",country:"malaysia",permit:""},
+    {name:"JS Thang Thang",phone:"+60178837981",email:"paungaiht95@gmail.com",position:"General Worker",city:"Myanmar",country:"myanmar",permit:""},
+    {name:"Md Sohel Rana",phone:"+601137821072",email:"www.Mdsohelranasddddd@gmail.com",position:"General Worker",city:"Stiawan",country:"bangladesh",permit:""},
+    {name:"Muhammad Motahar Hossain",phone:"+601141020804",email:"anafmotahar@gmail.com",position:"General Worker",city:"Narsingdi",country:"bangladesh",permit:""},
+    {name:"Nur Hossain",phone:"+601131258377",email:"nurhossain4479@gmail.com",position:"General Worker",city:"Jessore",country:"bangladesh",permit:""},
+    {name:"Muhammad Iqbal Abdullah",phone:"+60142921978",email:"iqbal.ruslan1994@gmail.com",position:"Car Detailing",city:"Kelantan",country:"malaysia",permit:""},
+    {name:"MR.GANESAN",phone:"+60133090472",email:"ganessann06@gmail.com",position:"Forklift/Material Handler",city:"Selangor",country:"indian",permit:""},
+    {name:"bilal muhammad",phone:"+60172047973",email:"ubmalikkhan123@gmail.com",position:"Company Job",city:"Selangor",country:"bangladesh",permit:""},
+    {name:"Gautam Arora",phone:"+917696056503",email:"goutamarora1989@gmail.com",position:"General Worker",city:"Tarn Taran",country:"indian",permit:""},
+    {name:"Jack Hawkes",phone:"+601116245587",email:"jeyansenthirajah@gmail.com",position:"General Worker",city:"Petaling Jaya",country:"indian",permit:""},
+    {name:"Yong Ahyoke",phone:"+601123632912",email:"ahyokeyong@gmail.com",position:"Supervisor",city:"Selangor",country:"malaysia",permit:""},
+    {name:"Maher Singh",phone:"+601127247510",email:"kjot39499@gmail.com",position:"Store Helper",city:"Batu Caves",country:"indian",permit:""},
+    {name:"Md Ariful Islam",phone:"+60187838731",email:"mdarifulislamkajol@41.com",position:"General Worker",city:"Joypurhat",country:"bangladesh",permit:""},
+    {name:"Reajul Islam",phone:"+601124054814",email:"reazuli492@gmail.com",position:"General Worker",city:"Bangladesh",country:"bangladesh",permit:""},
+    {name:"Arif Islam",phone:"+8801727262855",email:"arifislam05636@gmail.com",position:"General Worker",city:"KL",country:"bangladesh",permit:""},
+    {name:"Amir Hossain",phone:"+60169432630",email:"jharana4127@gmail.com",position:"General Worker",city:"Dhaka",country:"bangladesh",permit:""},
+    {name:"SaTti Shahid",phone:"+60011153462",email:"sattisatti6838@gmail.com",position:"General Worker",city:"Putrajaya",country:"bangladesh",permit:""},
+    {name:"Zaid Hassan",phone:"+60177338220",email:"Zaikhassan171@gmail.com",position:"Team Leader",city:"Kota Bharu",country:"malaysia",permit:""},
+    {name:"Rise Jonathan",phone:"+60102475395",email:"jjoyjonathan@gmail.com",position:"Technician AC",city:"Kota Kinabalu",country:"malaysia",permit:""},
+    {name:"Kumanan Subramaniam",phone:"+60164931032",email:"kssk768142@gmail.com",position:"Self Employed",city:"Sungai Petani",country:"indian",permit:""},
+    {name:"Bk Tan",phone:"+60122319621",email:"areli_enterprise@yahoo.com",position:"Contractor",city:"KL",country:"malaysia",permit:""},
+    {name:"Afzal Sarder",phone:"+60162849486",email:"sarderafzal1@gmail.com",position:"Logistics",city:"KL",country:"bangladesh",permit:""},
+    {name:"Arnaf Enamul",phone:"+60194242074",email:"enamulzzzzz05@gmail.com",position:"Company Work",city:"Comilla",country:"bangladesh",permit:""},
+    {name:"Md Riaz",phone:"+60164419729",email:"mdriaz2525@gmail.com",position:"Computer Operator",city:"Bangladesh",country:"bangladesh",permit:""},
+    {name:"Praba Rockerstars",phone:"+60168552404",email:"prabakaran120496@gmail.com",position:"General Worker",city:"Klang",country:"indian",permit:""},
+    {name:"Mohd Peter Mohamad",phone:"+60165426521",email:"mohdpeter250@gmail.com",position:"Security",city:"Sitiawan",country:"malaysia",permit:""},
+    {name:"Sazal Kundu",phone:"+601141345454",email:"sazalkundu19@gmail.com",position:"Company Work",city:"KL",country:"bangladesh",permit:""},
+    {name:"Ahmad MEer",phone:"+60143576649",email:"nawabkhanahmed042@gmail.com",position:"CSR",city:"Muzaffarabad",country:"other",permit:""},
+    {name:"law ming kiat",phone:"+601124108950",email:"mklawlaw65@gmail.com",position:"General Worker",city:"Jitra",country:"malaysia",permit:""},
+    {name:"Sreejith Su",phone:"+601168413710",email:"fz5sreejith@gmail.com",position:"CS",city:"Thiruvananthapuram",country:"indian",permit:""},
+    {name:"Aung Hla",phone:"+60182763656",email:"husnaymubarak176@gmail.com",position:"General Worker",city:"KL",country:"myanmar",permit:""},
+    {name:"Ramjan Khan",phone:"+60145729188",email:"mdramjankhan60200@gmail.com",position:"General Worker",city:"Senai",country:"bangladesh",permit:""},
+    {name:"Muhammd Mustafa",phone:"+60182199440",email:"mostafaqureshi54@gmail.com",position:"General Worker",city:"KL",country:"other",permit:""},
+    {name:"Babu Sheak",phone:"+601116799950",email:"babusheak70@gmail.com",position:"General Worker",city:"KL",country:"bangladesh",permit:""},
+    {name:"Md Habib",phone:"+60175023775",email:"mhafaisal59@gmail.com",position:"Storekeeper",city:"Rawang",country:"bangladesh",permit:""},
+    {name:"Kim",phone:"+601160848942",email:"akeembaharim6@gmail.com",position:"Online Distributor",city:"Seri Kembangan",country:"malaysia",permit:""},
+    {name:"Balamurugan Bala",phone:"+919025892366",email:"bala90859@gmail.com",position:"Cook",city:"Ramanathapuram",country:"indian",permit:""},
+    {name:"Amrit Singh",phone:"+601128091169",email:"amritjatt653@gmail.com",position:"Forklift",city:"Petaling Jaya",country:"indian",permit:""},
+    {name:"Md Solaiman Ahmed",phone:"+60138942085",email:"mdsamim23p@gmail.com",position:"Cabinet",city:"Canada",country:"bangladesh",permit:""},
+    {name:"Swetha Shuha",phone:"+60162900642",email:"swetha1502@hotmail.com",position:"Admin",city:"Shah Alam",country:"indian",permit:""},
+    {name:"Sekarasan Krishnasamy",phone:"+60193489110",email:"sekarasank@gmail.com",position:"Marketing Rep",city:"Klang",country:"indian",permit:""},
+    {name:"KARTIK25",phone:"+60146675653",email:"kartikkannan25@icloud.com",position:"Production Operator",city:"KL",country:"indian",permit:""},
+    {name:"Rajvinder Singh",phone:"+601139658064",email:"hardeepsingsing32@gmail.com",position:"Packing",city:"Patiala",country:"indian",permit:""},
+    {name:"Md Rifat Hasan",phone:"+60147140733",email:"rifathasan9998@gmail.com",position:"General Worker",city:"Kapar",country:"bangladesh",permit:""},
+    {name:"ANJAAR",phone:"+60109196173",email:"plainer.dogged_0@icloud.com",position:"General Worker",city:"Johor",country:"other",permit:""},
+    {name:"Shekar Vellala Thevar",phone:"+60192589226",email:"shekarthevar09@gmail.com",position:"Supermarket",city:"KL",country:"indian",permit:""},
+    {name:"jack",phone:"+60178271632",email:"",position:"General Worker",city:"Johor Bahru",country:"malaysia",permit:""},
+    {name:"VASUDEVAN",phone:"+601159000081",email:"",position:"General Worker",city:"Petaling Jaya",country:"indian",permit:""},
+    {name:"vimalanathan",phone:"+60105471770",email:"",position:"General Worker",city:"Kapar",country:"indian",permit:""},
+    {name:"Hema Chandran",phone:"+60172984562",email:"",position:"General Worker",city:"Klang",country:"indian",permit:""},
+    {name:"kavineshwary",phone:"+601121250871",email:"",position:"General Worker",city:"Petaling Jaya",country:"indian",permit:""},
+    {name:"ZULHASANI",phone:"+601121236284",email:"",position:"General Worker",city:"Petaling Jaya",country:"malaysia",permit:""},
+    {name:"zulhelmi",phone:"+60163464639",email:"",position:"General Worker",city:"Petaling Jaya",country:"malaysia",permit:""},
+    {name:"MOHAD ESHAL",phone:"+60163086643",email:"",position:"General Worker",city:"Puncak Alam",country:"malaysia",permit:""},
+    {name:"NAGEENAVIN",phone:"+601133296303",email:"",position:"General Worker",city:"Puchong",country:"indian",permit:""},
+    {name:"KOMATHY",phone:"+601137533435",email:"",position:"General Worker",city:"Petaling Jaya",country:"indian",permit:""},
+    {name:"Md Shaad",phone:"+601128693141",email:"mdshaad1111532751@gmail.com",position:"General Worker",city:"Cox's Bazar",country:"bangladesh",permit:""},
+    {name:"Devesh Rana",phone:"+601472672158",email:"kumarnirvesh272@gmail.com",position:"General Worker",city:"India",country:"indian",permit:""},
+    {name:"Ramakrishnan Theruvengadam",phone:"+60182359206",email:"ramakris0707@gmail.com",position:"Security",city:"WP",country:"indian",permit:""},
+    {name:"Abdullah Al Noman",phone:"+601162329530",email:"mdnoman01753@gmail.com",position:"Crew",city:"KL",country:"bangladesh",permit:""},
+    {name:"JS Joy",phone:"+8801615659882",email:"polacpaint1@gmail.com",position:"General Worker",city:"Dhaka",country:"bangladesh",permit:""},
+    {name:"Nns Nadeem",phone:"+60104682934",email:"nnsnadeem9@gmail.com",position:"General Worker",city:"Johor Bahru",country:"bangladesh",permit:""},
+    {name:"MD Earshad Hossain",phone:"+601129902495",email:"ahamadearshad68@gmail.com",position:"Service Apartment",city:"Dhaka",country:"bangladesh",permit:""},
+    {name:"Jastine Augustine",phone:"+60122331345",email:"jastine75@gmail.com",position:"Account Manager",city:"KL",country:"malaysia",permit:""},
+    {name:"HIRAN TWENTY4",phone:"+601151675057",email:"thxran04@icloud.com",position:"Coordinator",city:"Banting",country:"indian",permit:""},
+    {name:"SABRA",phone:"+60162557162",email:"",position:"General Worker",city:"Petaling Jaya",country:"other",permit:""},
+    {name:"HIRAN",phone:"+60165360418",email:"",position:"General Worker",city:"Petaling Jaya",country:"indian",permit:""},
+    {name:"Che ezaizafizai bin Che Mohamad",phone:"+601128207807",email:"a21156146@gmail.com",position:"Tukang Bangunan",city:"Kuala Kangsar",country:"malaysia",permit:""},
+    {name:"Amol Kumar Patel",phone:"+60102304173",email:"amolpate62@gmail.com",position:"Driver",city:"Surat",country:"indian",permit:""},
+    {name:"Patricio Smile",phone:"+601111361022",email:"brightezeba@gmail.com",position:"General Worker",city:"Miami",country:"other",permit:""},
+    {name:"Tawab Ali khan",phone:"+60109130245",email:"tsmarketingbnu89@gmail.com",position:"General Worker",city:"Penang",country:"other",permit:""},
+    {name:"Parmeshwar Sanatan",phone:"+919882237121",email:"punjabifastfood279@gmail.com",position:"Packing",city:"Hoshiarpur",country:"indian",permit:""},
+    {name:"Zeeshan Mujahid",phone:"+601137959707",email:"zeeshanmujahid49@gmail.com",position:"Service",city:"KL",country:"other",permit:""},
+    {name:"Boy Arasu",phone:"+60146604076",email:"boyarasu81@gmail.com",position:"Lab Sampler",city:"KL",country:"indian",permit:""},
+    {name:"chhethar Sherpa",phone:"+601164577245",email:"chhethar@gmail.com",position:"Factory Worker",city:"Petaling Jaya",country:"nepal",permit:""},
+    {name:"Hamdan Hasan",phone:"+60123908515",email:"hamdanhjdan@gmail.com",position:"General Worker",city:"Bukit Rotan",country:"malaysia",permit:""},
+    {name:"Eidsor Bai",phone:"+601121068303",email:"eidsorbaiee@gmail.com",position:"General Worker",city:"Kuantan",country:"bangladesh",permit:""},
+    {name:"peng_wills",phone:"+60128716673",email:"pengiranska2022@gmail.com",position:"General Worker",city:"Miri",country:"malaysia",permit:""},
+    {name:"md.kamruzzaman",phone:"+8801175338277",email:"kamruzzaman1482@gmail.com",position:"General Worker",city:"KL",country:"bangladesh",permit:""},
+    {name:"Jeevitha Ranggi Kutty",phone:"+60172249604",email:"jeevithajeevitha680@gmail.com",position:"Operator",city:"Johor Bahru",country:"indian",permit:""},
+    {name:"Uzair Khan",phone:"+60135041355",email:"uzairkhanchanchan@gmail.com",position:"Electrician/AC",city:"KL",country:"bangladesh",permit:""},
+    {name:"Francis Jungan FJ",phone:"+601139802960",email:"francisjungan@gmail.com",position:"Company Work",city:"Johor Bahru",country:"malaysia",permit:""},
+    {name:"Ahmad Ali Sharidan",phone:"+60179273207",email:"alisharidan0143@gmail.com",position:"Technician",city:"Ketereh",country:"malaysia",permit:""},
+    {name:"Mittun Mittun",phone:"+60102565163",email:"PMittunprosto85@yahoo.com",position:"Any Job",city:"Bahau NS",country:"indian",permit:""},
+    {name:"Nantha Kumar",phone:"+60102063121",email:"nanthakuma1975@gmail.com",position:"General Worker",city:"Petaling Jaya",country:"indian",permit:""},
+    {name:"Shihab Uddin Shihab",phone:"+601121030655",email:"shihabuddinshihab1620@gmail.com",position:"Worker",city:"Petaling Jaya",country:"bangladesh",permit:""},
+    {name:"Sanjeewa Wickramasingha",phone:"+601161931429",email:"suduamma1971@gmail.com",position:"Driver",city:"Johor Bahru",country:"other",permit:""},
+    {name:"mohd Khairul Imran",phone:"+60173022938",email:"alongimran88@gmail.com",position:"General Worker",city:"KL",country:"malaysia",permit:""},
+    {name:"Md Abu Bakker",phone:"+60178905019",email:"defa28293@gmail.com",position:"General Worker",city:"KL",country:"bangladesh",permit:""},
+    {name:"Fred Eneos",phone:"+60136092190",email:"bennmatius@gemail.com",position:"Mechanic",city:"KL",country:"malaysia",permit:""},
+    {name:"Raju Bhai",phone:"+60173563595",email:"rajubhai304050123456abc@gmail.com",position:"General Worker",city:"Malangwa",country:"nepal",permit:""},
+    {name:"zahid",phone:"+601131541665",email:"najmabegam170@gmail.com",position:"General Worker",city:"Selangor",country:"bangladesh",permit:""},
+    {name:"Ak_",phone:"+601116519080",email:"anantha2766686@gmail.com",position:"Studying",city:"KL",country:"indian",permit:""},
+    {name:"Sandeep Singh",phone:"+601161431961",email:"sanndeep12223@gmail.com",position:"Construction",city:"Penang",country:"indian",permit:""},
+    {name:"Sheikh Salam",phone:"+60187773597",email:"sheikhsalam018366@gmail.com",position:"Electrician Assistant",city:"Kluang",country:"malaysia",permit:"",date:"1 Apr"},
+    {name:"Uvan Rajz",phone:"+60146073325",email:"uvanraj2410@gmail.com",position:"Operator",city:"Johor Bahru",country:"indian",permit:"",date:"1 Apr"},
+    {name:"Manjeet Gill",phone:"+60109176028",email:"mannug2017@gmail.com",position:"Office Work",city:"Abohar",country:"indian",permit:"",date:"1 Apr"},
+    {name:"Noh Yusop",phone:"+60198347341",email:"yusopnoh83@gmail.com",position:"Palm Oil Plantation",city:"Zamboanga",country:"malaysia",permit:"",date:"1 Apr"},
+    {name:"Ezlena Black",phone:"+60168027554",email:"sharvinnsharvinn853@gmail.com",position:"Warehouse",city:"Kulim",country:"malaysia",permit:"",date:"1 Apr"},
+    {name:"Mohamad Tee",phone:"+60173355041",email:"mahamadtee0116@gmail.com",position:"Ceramic",city:"Klang",country:"malaysia",permit:"",date:"1 Apr"},
+    {name:"Arjun Saud",phone:"+9779848841028",email:"arjunbhaikok@gmail.com",position:"General Worker",city:"Nepal",country:"nepal",permit:"",date:"1 Apr"},
+    {name:"ZawMyint1234",phone:"+60175251995",email:"Jawmil123456@gmail.com",position:"General Worker",city:"Yangon",country:"myanmar",permit:"",date:"1 Apr"},
+    {name:"Mk Salman",phone:"+60165253600",email:"sanajan9427945@gmail.com",position:"General Worker",city:"KL",country:"malaysia",permit:"",date:"1 Apr"},
+    {name:"Frankie Deniz",phone:"+60194205101",email:"frankiedenis4@gmail.com",position:"General Helper",city:"Sibu Sarawak",country:"malaysia",permit:"",date:"1 Apr"},
+    {name:"Bruno Douck",phone:"+237680794998",email:"douckbruno@gmail.com",position:"Factory",city:"KL",country:"other",permit:"",date:"1 Apr"},
+    {name:"MD azmir",phone:"+60179505284",email:"hossainms1545331@gmail.com",position:"Packing/Loading",city:"Dhaka",country:"bangladesh",permit:"",date:"1 Apr"},
+    {name:"Ibrahim Arif",phone:"+60183816516",email:"hasibibrahim89@gmail.com",position:"Manpower Supply",city:"Kajang",country:"malaysia",permit:"",date:"3 Apr"},
+    {name:"Mohd Jamil",phone:"+60176379757",email:"jamileshak@gmail.com",position:"Any",city:"Klang",country:"malaysia",permit:"",date:"3 Apr"}
+  ],
+  'Lathe Machine': [
+    {name:"Razali",phone:"+60108675708",email:"vruganov7@gmail.com",position:"Lathe Operator",city:"Hulu Langat",country:"malaysia",permit:"yes"},
+    {name:"Jeevitha",phone:"+60172249604",email:"",position:"Lathe Operator",city:"",country:"indian",permit:""},
+    {name:"Unknown 3",phone:"+601151297809",email:"",position:"Lathe Operator",city:"",country:"other",permit:""},
+    {name:"Muhd Adam Abdullah",phone:"+601137789694",email:"Jackboboy89@gmail.com",position:"Online Work",city:"Keningau",country:"malaysia",permit:"",date:"3 Apr"},
+    {name:"Raihan Zahir",phone:"+60166365924",email:"zahirraihan2192@gmail.com",position:"General Worker",city:"Selangor",country:"bangladesh",permit:"",date:"3 Apr"},
+    {name:"Muhammad Faiz",phone:"+60183295060",email:"faizsafiya6@gmail.com",position:"Management",city:"KL",country:"malaysia",permit:"",date:"3 Apr"},
+    {name:"Mohd Zulkefli bin Mohd nor",phone:"+601119960236",email:"aqkamu@gmail.com",position:"Sendiri",city:"Mersing",country:"malaysia",permit:"",date:"4 Apr"}
+  ],
+  'Barber Community': [
+    {name:"Local 1",phone:"+60136039636",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 2",phone:"+60172841271",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 3",phone:"+60182802466",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 4",phone:"+60145366718",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 5",phone:"+601135113164",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 6",phone:"+60122472818",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 7",phone:"+60136687083",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 8",phone:"+601128488808",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 9",phone:"+60176763760",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 10",phone:"+60198705354",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 11",phone:"+601175195045",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 12",phone:"+60183670165",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 13",phone:"+60163100047",email:"",position:"Barber - Link Sent",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 14",phone:"+601129390019",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 15",phone:"+601127781903",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 16",phone:"+60186659780",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"Local 17",phone:"+601139007583",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes"},
+    {name:"India 1",phone:"+601155188230",email:"",position:"Barber",city:"India",country:"indian",permit:""},
+    {name:"India 2",phone:"+601140220416",email:"",position:"Barber",city:"India",country:"indian",permit:""},
+    {name:"Nepal 1",phone:"+60175207619",email:"",position:"Barber",city:"Nepal",country:"nepal",permit:""},
+    {name:"India 3",phone:"+60183990541",email:"",position:"Barber",city:"India",country:"indian",permit:""},
+    {name:"India 4",phone:"+601125657506",email:"",position:"Barber",city:"India",country:"indian",permit:""},
+    {name:"India 5",phone:"+919956481165",email:"",position:"Barber",city:"India",country:"indian",permit:""},
+    {name:"Indo 1",phone:"+60195339269",email:"",position:"Barber",city:"Indonesia",country:"indonesia",permit:""},
+    {name:"India 6",phone:"+601137924923",email:"",position:"Barber",city:"India",country:"indian",permit:""},
+    {name:"India 7",phone:"+919159446547",email:"",position:"Barber",city:"India",country:"indian",permit:""},
+    {name:"Pakistan 1",phone:"+923072446947",email:"",position:"Barber",city:"Pakistan",country:"other",permit:""},
+    {name:"India 8",phone:"+917715060531",email:"",position:"Barber",city:"India",country:"indian",permit:""},
+    {name:"Vinrich Barberhauz",phone:"+60163251802",email:"",position:"Shop Owner",city:"Malaysia",country:"malaysia",permit:"yes",date:"6 Apr"},
+    {name:"Local 18",phone:"+60136055185",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes",date:"6 Apr"},
+    {name:"Shop Owner 2",phone:"+60135185560",email:"",position:"Shop Owner",city:"Malaysia",country:"malaysia",permit:"yes",date:"6 Apr"},
+    {name:"Local 19",phone:"+60174863658",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes",date:"6 Apr"},
+    {name:"Local 20",phone:"+60183860024",email:"",position:"Barber",city:"Malaysia",country:"malaysia",permit:"yes",date:"6 Apr"},
+    {name:"Training 1",phone:"+60163284009",email:"",position:"Barber Training",city:"Malaysia",country:"malaysia",permit:"yes",date:"6 Apr"},
+    {name:"Training 2",phone:"+601164121335",email:"",position:"Barber Training",city:"Malaysia",country:"malaysia",permit:"yes",date:"6 Apr"}
+  ],
+  'Direct Interacted': [
+    {name:"Harapan",phone:"+60177769719",email:"",position:"General Worker",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"Akash",phone:"+60183669735",email:"",position:"General Worker",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"Zambri",phone:"+601125360154",email:"",position:"General Worker",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"XYZ",phone:"+60168194746",email:"",position:"Kitchen",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"LOK",phone:"+601139537638",email:"",position:"Loading/Unloading",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"Nadhira",phone:"+60175117843",email:"",position:"General Worker",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"Vinoth",phone:"+601127099198",email:"",position:"General Worker",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"Kyaw hlng",phone:"+601161412062",email:"",position:"General Worker",city:"Malaysia",country:"myanmar",permit:""},
+    {name:"farhan",phone:"+601128045282",email:"",position:"General Worker",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"mankatha",phone:"+60107081285",email:"",position:"General Worker",city:"Malaysia",country:"indian",permit:""},
+    {name:"Naveed",phone:"+60176445912",email:"",position:"Loading/Unloading",city:"Malaysia",country:"other",permit:""},
+    {name:"Abrab",phone:"+601128492691",email:"",position:"Kitchen",city:"Malaysia",country:"other",permit:""},
+    {name:"Moh hamzan",phone:"+60176035886",email:"",position:"Kitchen",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"Babu hussain",phone:"+60182075496",email:"",position:"Loading/Unloading",city:"Malaysia",country:"bangladesh",permit:""},
+    {name:"Jagat ram",phone:"+601140192823",email:"",position:"General Worker",city:"Malaysia",country:"indian",permit:""},
+    {name:"Sazal hames",phone:"+601114134554",email:"",position:"General Worker",city:"Malaysia",country:"bangladesh",permit:""},
+    {name:"Manjeet gill",phone:"+60109176028",email:"",position:"Loading/Unloading",city:"Malaysia",country:"indian",permit:""},
+    {name:"Ray",phone:"+6584125956",email:"",position:"Kitchen",city:"Malaysia",country:"other",permit:""},
+    {name:"Iyan",phone:"+6289672738856",email:"",position:"Kitchen",city:"Malaysia",country:"indonesia",permit:""},
+    {name:"Jattayab",phone:"+601117515141",email:"",position:"Loading/Unloading",city:"Malaysia",country:"other",permit:""},
+    {name:"Nyaz",phone:"+919170651513",email:"",position:"Loading/Unloading",city:"Malaysia",country:"indian",permit:""},
+    {name:"Al Faqir",phone:"+60182695056",email:"",position:"General Worker",city:"Malaysia",country:"other",permit:""},
+    {name:"Along G",phone:"+601125349322",email:"",position:"General Worker",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"Pathan",phone:"+601111051523",email:"",position:"General Worker",city:"Malaysia",country:"other",permit:""},
+    {name:"Paih",phone:"+60182621985",email:"",position:"General Worker",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"Nazrul",phone:"+601130069731",email:"",position:"General Worker",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"Vijay",phone:"+919492969218",email:"",position:"General Worker",city:"India",country:"indian",permit:""},
+    {name:"Makuda",phone:"+919701970926",email:"",position:"B2B",city:"India",country:"indian",permit:""},
+    {name:"Pal",phone:"+60175900327",email:"",position:"Kitchen",city:"Malaysia",country:"malaysia",permit:""},
+    {name:"Moh sheikh",phone:"+601139758600",email:"",position:"Kitchen",city:"Malaysia",country:"other",permit:""},
+    {name:"Aminul",phone:"+60196631016",email:"",position:"Kitchen",city:"Malaysia",country:"bangladesh",permit:""},
+    {name:"Bruno",phone:"+23780794998",email:"",position:"Kitchen",city:"Malaysia",country:"other",permit:""},
+    {name:"Arang",phone:"+60176938143",email:"",position:"Kitchen",city:"Malaysia",country:"other",permit:""},
+    {name:"Faruk",phone:"+60189626991",email:"",position:"Kitchen",city:"Malaysia",country:"bangladesh",permit:""},
+    {name:"Nancy",phone:"+601171181093",email:"",position:"Kitchen",city:"Malaysia",country:"other",permit:""},
+    {name:"Topsy",phone:"+601116324731",email:"",position:"Kitchen",city:"Malaysia",country:"other",permit:""},
+    {name:"As model",phone:"+601131053691",email:"",position:"Kitchen",city:"Malaysia",country:"bangladesh",permit:""},
+    {name:"Kyaw lin",phone:"+60177072190",email:"",position:"Kitchen",city:"Malaysia",country:"myanmar",permit:""},
+    {name:"Moh Rasel",phone:"+60102421727",email:"",position:"Kitchen",city:"Malaysia",country:"bangladesh",permit:""}
+  ],
+  'Barber Shop Owner': [
+    {name:"RESHAN",phone:"+60146477426",email:"",position:"Barber Shop Owner",city:"KL",country:"malaysia",permit:"yes"},
+    {name:"M&A Hair Saloon",phone:"+601126280887",email:"",position:"Barber Shop Owner",city:"Labis",country:"malaysia",permit:"yes"},
+    {name:"Unknown Owner",phone:"+60172841271",email:"",position:"Barber Shop Owner",city:"",country:"malaysia",permit:"yes"}
+  ]
+};
+
+var saved = localStorage.getItem('mc_cand_db');
+if(saved) DB = JSON.parse(saved);
+var notes   = JSON.parse(localStorage.getItem('mc_cand_notes')   || '{}');
+var statuses = JSON.parse(localStorage.getItem('mc_cand_status') || '{}');
+var owners   = JSON.parse(localStorage.getItem('mc_cand_owners') || '{}');
+
+function saveAll(){
+  localStorage.setItem('mc_cand_db',     JSON.stringify(DB));
+  localStorage.setItem('mc_cand_notes',  JSON.stringify(notes));
+  localStorage.setItem('mc_cand_status', JSON.stringify(statuses));
+  localStorage.setItem('mc_cand_owners', JSON.stringify(owners));
+}
+
+// ── HELPERS ───────────────────────────────────────────────────
+function getOwner(key)  { return owners[key] || ''; }
+function isMine(key)    { var o = getOwner(key); return !o || o === currentUser.username; }
+function isLocked(key)  { var o = getOwner(key); return o && o !== currentUser.username; }
+function ownerColor(key){ var o = getOwner(key); return o && USERS[o] ? USERS[o].color : ''; }
+function ownerBg(key)   { var o = getOwner(key); return o && USERS[o] ? USERS[o].colorBg : ''; }
+function ownerName(key) { var o = getOwner(key); return o && USERS[o] ? USERS[o].displayName : ''; }
+
+// ── AUTH FUNCTIONS ────────────────────────────────────────────
+function doLogin() {
+  var un  = document.getElementById('unInput').value.trim().toLowerCase();
+  var pw  = document.getElementById('pwInput').value;
+  var err = document.getElementById('loginErr');
+  if (USERS[un] && USERS[un].password === pw) {
+    currentUser = { username: un, role: USERS[un].role, displayName: USERS[un].displayName };
+    err.style.display = 'none';
+    startApp();
+  } else {
+    err.style.display = 'block';
+  }
+}
+
+function startApp() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  var tag = document.getElementById('roleTag');
+  tag.textContent = currentUser.role === 'admin' ? 'Admin' : 'Staff';
+  tag.className = 'tb-badge ' + (currentUser.role === 'admin' ? 'ba' : 'bs');
+  document.getElementById('userTag').textContent = currentUser.displayName;
+  // Show staff tab for admin only
+  document.getElementById('tabStaff').style.display = currentUser.role === 'admin' ? 'inline-block' : 'none';
+  // Set activeTab to first allowed tab
+  var allowed = getAllowedTabs(currentUser.username);
+  var firstIdx = TABS.indexOf(allowed[0]);
+  activeTab = firstIdx >= 0 ? firstIdx : 0;
+  buildTabs();
+  render();
+}
+
+function logout() {
+  currentUser = null; activeTab = 0;
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('unInput').value = '';
+  document.getElementById('pwInput').value = '';
+}
+
+// ── MAIN TAB SWITCHING ────────────────────────────────────────
+function switchMainTab(tab) {
+  currentMainTab = tab;
+  var pages = ['candidatesPage','reportPage','staffPage'];
+  var btns  = ['tabCandidates','tabAnalytics','tabStaff'];
+  var names = ['candidates','analytics','staff'];
+  pages.forEach(function(id,i){
+    document.getElementById(id).style.display = (names[i]===tab?'block':'none');
+  });
+  btns.forEach(function(id,i){
+    document.getElementById(id).classList.toggle('active', names[i]===tab);
+  });
+  if (tab === 'analytics') renderReport();
+  if (tab === 'staff') renderStaffList();
+}
+
+// ── CANDIDATE TABS ────────────────────────────────────────────
+function buildTabs() {
+  var allowed = getAllowedTabs(currentUser.username);
+  document.getElementById('tabsEl').innerHTML = TABS.map(function(t,i) {
+    if (allowed.indexOf(t) === -1) return ''; // hide non-allowed tabs
+    return '<div class="tab ' + (i===activeTab?'active':'') + '" data-action="switchtab" data-tabidx="'+i+'">' +
+      t + '<span class="cnt">' + DB[t].length + '</span></div>';
+  }).join('');
+}
+
+function switchTab(i) {
+  // Only allow switching to permitted tabs
+  var allowed = getAllowedTabs(currentUser.username);
+  if (allowed.indexOf(TABS[i]) === -1) return;
+  activeTab = i; buildTabs(); render();
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+var cMap   = {malaysia:'MY',bangladesh:'BD',indian:'IN',nepal:'NP',myanmar:'MM',indonesia:'ID',other:'?'};
+var cClass = {malaysia:'b-my',bangladesh:'b-bd',indian:'b-in',nepal:'b-np',myanmar:'b-mm',indonesia:'b-id',other:'b-ot'};
+var statusClass = {New:'s-new',Contacted:'s-contacted',Shortlisted:'s-shortlisted',Placed:'s-placed',Rejected:'s-rejected'};
+
+function render() {
+  var tab      = TABS[activeTab];
+  var rows     = DB[tab];
+  var srch     = document.getElementById('srch').value.toLowerCase();
+  var fc       = document.getElementById('fCountry').value;
+  var fp       = document.getElementById('fPermit').value;
+  var fs       = document.getElementById('fStatus').value;
+  var fo       = document.getElementById('fOwner').value;
+
+  var filtered = rows.filter(function(r,i) {
+    var key = tab+'_'+i;
+    var st  = statuses[key] || 'New';
+    var ms  = !srch || [r.name,r.phone,r.email,r.position,r.city].join(' ').toLowerCase().includes(srch);
+    var mc  = !fc   || (r.country||'').includes(fc);
+    var mp  = !fp   || (r.permit||'').toLowerCase() === fp;
+    var mst = !fs   || st === fs;
+    var mo  = true;
+    if (fo === 'mine')      mo = getOwner(key) === currentUser.username;
+    else if (fo === 'unclaimed') mo = !getOwner(key);
+    return ms && mc && mp && mst && mo;
+  });
+
+  var total      = rows.length;
+  var placed     = rows.filter(function(_,i){ return (statuses[tab+'_'+i]||'New')==='Placed'; }).length;
+  var shortlisted= rows.filter(function(_,i){ return (statuses[tab+'_'+i]||'New')==='Shortlisted'; }).length;
+  var withPermit = rows.filter(function(r){ return (r.permit||'').toLowerCase()==='yes'; }).length;
+
+  document.getElementById('statsEl').innerHTML =
+    '<div class="stat"><div class="stat-val">'      +total+       '</div><div class="stat-label">Total</div></div>' +
+    '<div class="stat"><div class="stat-val">'      +withPermit+  '</div><div class="stat-label">Has Permit</div></div>' +
+    '<div class="stat"><div class="stat-val" style="color:#c4b5fd">' +shortlisted+ '</div><div class="stat-label">Shortlisted</div></div>' +
+    '<div class="stat"><div class="stat-val" style="color:#34d399">' +placed+      '</div><div class="stat-label">Placed</div></div>' +
+    '<div class="stat"><div class="stat-val">'      +filtered.length+ '</div><div class="stat-label">Showing</div></div>';
+
+  if (!filtered.length) {
+    document.getElementById('tableEl').innerHTML = '<div class="no-data">No candidates match your filters.</div>';
+    return;
+  }
+
+  var hasDate = ['Loading / Unloading','Car Spare Parts'].includes(tab);
+  var hasDeg  = tab === 'Operation Manager';
+  var isAdmin = currentUser.role === 'admin';
+
+  var h = '<div class="table-wrap"><table><thead><tr>' +
+    '<th>#</th><th>Name</th><th>Phone</th><th>Email</th><th>Position</th><th>City</th>' +
+    '<th>Country</th><th>Permit</th>' +
+    (hasDate ? '<th>Date</th>' : '') +
+    (hasDeg  ? '<th>Deg</th><th>Exp</th>' : '') +
+    '<th>Handler</th><th>Status</th><th>Notes</th>' +
+    (isAdmin  ? '<th></th>' : '') +
+    '</tr></thead><tbody>';
+
+  filtered.forEach(function(r, fi) {
+    var origIdx = rows.indexOf(r);
+    var key     = tab+'_'+origIdx;
+    var st      = statuses[key] || 'New';
+    var locked  = isLocked(key);
+    var sc      = statusClass[st] || 's-new';
+    var cc      = cClass[r.country] || 'b-ot';
+    var cl      = cMap[r.country]   || '?';
+    var rowStyle= locked ? 'background:'+ownerBg(key)+';' : '';
+    var borderSt= locked ? 'border-left:3px solid '+ownerColor(key)+';' : '';
+    var noteArr = notes[key] || [];
+    var lastNote= noteArr.length ? noteArr[noteArr.length-1] : null;
+
+    // Handler cell — data attributes avoid all quote issues
+    var handlerCell = '';
+    if (!getOwner(key)) {
+      handlerCell = '<button class="claim-btn" data-action="claim" data-key="'+key+'">+ Claim</button>';
+    } else if (locked) {
+      handlerCell = '<div class="owner-tag" style="color:'+ownerColor(key)+'">&#9632; '+ownerName(key)+'</div>' +
+                    '<div style="font-size:10px;color:var(--text3)">locked</div>';
+    } else {
+      handlerCell = '<div class="owner-tag" style="color:'+ownerColor(key)+'">&#9632; You</div>' +
+                    '<button class="release-btn" data-action="release" data-key="'+key+'" title="Release">&#10006;</button>';
+    }
+
+    // Status cell — data attributes for onchange too
+    var statusCell = '';
+    if (locked) {
+      var stColor = st==='Placed'?'#34d399':st==='Shortlisted'?'#c4b5fd':st==='Contacted'?'#60a5fa':st==='Rejected'?'#f87171':'#94a3b8';
+      statusCell = '<span class="locked-status" style="color:'+stColor+'">'+st+'</span>';
+    } else {
+      statusCell = '<select class="status-sel '+sc+'" data-action="status" data-key="'+key+'">' +
+        ['New','Contacted','Shortlisted','Placed','Rejected'].map(function(s) {
+          return '<option'+(st===s?' selected':'')+'>'+s+'</option>';
+        }).join('') + '</select>';
+    }
+
+    // Notes cell
+    var notesCell = '';
+    if (locked) {
+      notesCell = lastNote ?
+        '<div class="note-text">'+lastNote.text+'</div><div class="note-by">'+lastNote.by+' &middot; '+lastNote.date+'</div>' :
+        '<span style="color:var(--text3);font-size:11px">-</span>';
+    } else {
+      notesCell = (lastNote ?
+        '<div class="note-text">'+lastNote.text+'</div><div class="note-by">'+lastNote.by+' &middot; '+lastNote.date+'</div>' :
+        '<span style="color:var(--text3);font-size:11px">No notes</span>') +
+        '<button class="note-btn" data-action="note" data-key="'+key+'" data-name="'+r.name.replace(/"/g,'&quot;')+'" style="margin-top:3px">+ Note</button>';
+    }
+
+    h += '<tr style="'+rowStyle+'">' +
+      '<td style="color:var(--text3);font-family:DM Mono,monospace;font-size:11px;'+borderSt+'">'+(fi+1)+'</td>' +
+      '<td class="name-cell">'+r.name+'</td>' +
+      '<td>'+(r.phone?'<a class="phone-link" href="tel:'+r.phone+'">'+r.phone+'</a>':'-')+'</td>' +
+      '<td>'+(r.email?'<a class="email-link" href="mailto:'+r.email+'">'+r.email+'</a>':'-')+'</td>' +
+      '<td style="color:var(--text2)">'+(r.position||'-')+'</td>' +
+      '<td style="color:var(--text3)">'+(r.city||'-')+'</td>' +
+      '<td><span class="badge '+cc+'">'+cl+'</span></td>' +
+      '<td>'+(r.permit==='yes'?'<span class="permit-y">&#10003;</span>':r.permit==='no'?'<span class="permit-n">&#10007;</span>':'<span style="color:var(--text3)">&#8212;</span>')+'</td>' +
+      (hasDate?'<td style="color:var(--text3);font-size:11px">'+(r.date||'-')+'</td>':'') +
+      (hasDeg ?'<td style="text-align:center">'+(r.degree==='yes'?'<span class="permit-y">&#10003;</span>':'<span class="permit-n">&#10007;</span>')+'</td>' +
+               '<td style="text-align:center">'+(r.exp==='yes'?'<span class="permit-y">&#10003;</span>':'<span class="permit-n">&#10007;</span>')+'</td>':'') +
+      '<td>'+handlerCell+'</td>' +
+      '<td>'+statusCell+'</td>' +
+      '<td>'+notesCell+'</td>' +
+      (isAdmin?'<td><button class="del-btn" data-action="delete" data-tab="'+tab+'" data-idx="'+origIdx+'">Del</button></td>':'') +
+      '</tr>';
+  });
+  h += '</tbody></table></div>';
+  document.getElementById('tableEl').innerHTML = h;
+}
+
+// ── CLAIM / RELEASE ───────────────────────────────────────────
+function claimCandidate(key) {
+  owners[key] = currentUser.username;
+  if (!statuses[key]) statuses[key] = 'New';
+  saveAll(); render();
+}
+
+function releaseCandidate(key) {
+  if (currentUser.role !== 'admin' && owners[key] !== currentUser.username) return;
+  if (!confirm('Release this candidate? Others will be able to claim them.')) return;
+  delete owners[key];
+  saveAll(); render();
+}
+
+// ── STATUS ────────────────────────────────────────────────────
+function updateStatus(key, val, el) {
+  statuses[key] = val; saveAll();
+  el.className = 'status-sel ' + (statusClass[val]||'s-new');
+}
+
+function deleteCandidate(tab, idx) {
+  if (currentUser.role !== 'admin') return;
+  if (!confirm('Delete '+DB[tab][idx].name+'?')) return;
+  DB[tab].splice(idx,1); saveAll(); buildTabs(); render();
+}
+
+// ── NOTES ─────────────────────────────────────────────────────
+function openNote(key, name) {
+  noteTarget = key;
+  document.getElementById('noteModalSub').textContent = 'Candidate: '+name;
+  var arr  = notes[key] || [];
+  var wrap = document.getElementById('notesHistoryWrap');
+  if (arr.length) {
+    wrap.innerHTML = '<label class="modal-label">History ('+arr.length+')</label>' +
+      '<div class="notes-history">' +
+      arr.map(function(n){
+        return '<div class="note-entry"><span class="ne-by">'+n.by+'</span><span class="ne-dt">'+n.date+'</span><div class="ne-tx">'+n.text+'</div></div>';
+      }).join('') + '</div>';
+  } else { wrap.innerHTML = ''; }
+  document.getElementById('noteInput').value = '';
+  document.getElementById('noteModal').classList.add('open');
+}
+
+function closeNote() {
+  document.getElementById('noteModal').classList.remove('open');
+  noteTarget = null;
+}
+
+function saveNote() {
+  var val = document.getElementById('noteInput').value.trim();
+  if (!val) return;
+  if (!notes[noteTarget]) notes[noteTarget] = [];
+  notes[noteTarget].push({
+    by:   currentUser.displayName,
+    date: new Date().toLocaleDateString('en-MY'),
+    text: val
+  });
+  saveAll(); closeNote(); render();
+}
+
+document.getElementById('noteModal').addEventListener('click', function(e) {
+  if (e.target === this) closeNote();
+});
+
+
+// ── STAFF MANAGEMENT (Admin only) ─────────────────────────────
+var COLOR_OPTIONS = [
+  {color:'#10b981',bg:'rgba(16,185,129,0.13)'},
+  {color:'#3b82f6',bg:'rgba(59,130,246,0.13)'},
+  {color:'#8b5cf6',bg:'rgba(139,92,246,0.13)'},
+  {color:'#f59e0b',bg:'rgba(245,158,11,0.13)'},
+  {color:'#ec4899',bg:'rgba(236,72,153,0.13)'},
+  {color:'#06b6d4',bg:'rgba(6,182,212,0.13)'},
+  {color:'#f97316',bg:'rgba(249,115,22,0.13)'},
+  {color:'#84cc16',bg:'rgba(132,204,22,0.13)'}
+];
+
+function openStaffModal(editUn) {
+  var modal = document.getElementById('staffModal');
+  var isEdit = !!editUn;
+  var u = isEdit ? USERS[editUn] : null;
+
+  document.getElementById('staffModalTitle').textContent = isEdit ? 'Edit Staff Member' : 'Register New Staff';
+  document.getElementById('sm-un').value = isEdit ? editUn : '';
+  document.getElementById('sm-un').disabled = isEdit;
+  document.getElementById('sm-name').value = isEdit ? u.displayName : '';
+  document.getElementById('sm-pw').value = isEdit ? u.password : '';
+  document.getElementById('sm-role').value = isEdit ? u.role : 'staff';
+  document.getElementById('sm-editun').value = isEdit ? editUn : '';
+
+  // Build tab checkboxes
+  var allowedTabs = isEdit ? (u.tabs || ['all']) : ['all'];
+  var tabsHtml = '<label style="display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:13px;cursor:pointer;">' +
+    '<input type="checkbox" id="sm-tab-all" value="all" ' + (allowedTabs[0]==='all'?'checked':'') + ' onchange="toggleAllTabs(this)"> All Tabs (no restriction)</label>';
+  TABS.forEach(function(t) {
+    var checked = allowedTabs[0]==='all' || allowedTabs.indexOf(t)>=0;
+    tabsHtml += '<label style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:13px;cursor:pointer;padding-left:16px;">' +
+      '<input type="checkbox" class="sm-tab-item" value="'+t+'" '+(checked?'checked':'')+'>'+t+'</label>';
+  });
+  document.getElementById('sm-tabs').innerHTML = tabsHtml;
+
+  // Build colour picker
+  var colorHtml = '<div style="display:flex;gap:8px;flex-wrap:wrap;">';
+  COLOR_OPTIONS.forEach(function(c, ci) {
+    var selected = isEdit && u.color === c.color;
+    colorHtml += '<div data-ci="'+ci+'" onclick="selectColor('+ci+')" style="width:28px;height:28px;border-radius:50%;background:'+c.color+';cursor:pointer;border:3px solid '+(selected?'white':'transparent')+';box-shadow:'+(selected?'0 0 0 2px '+c.color:'none')+'" title="'+c.color+'"></div>';
+  });
+  colorHtml += '</div>';
+  document.getElementById('sm-color').innerHTML = colorHtml;
+  document.getElementById('sm-color').dataset.selected = isEdit ? COLOR_OPTIONS.findIndex(function(c){ return c.color === (u?u.color:''); }) : 0;
+
+  modal.classList.add('open');
+}
+
+function selectColor(ci) {
+  document.getElementById('sm-color').dataset.selected = ci;
+  document.querySelectorAll('#sm-color [data-ci]').forEach(function(el) {
+    var idx = parseInt(el.dataset.ci);
+    el.style.border = idx === ci ? '3px solid white' : '3px solid transparent';
+    el.style.boxShadow = idx === ci ? '0 0 0 2px '+COLOR_OPTIONS[ci].color : 'none';
+  });
+}
+
+function toggleAllTabs(cb) {
+  document.querySelectorAll('.sm-tab-item').forEach(function(el) { el.checked = cb.checked; el.disabled = cb.checked; });
+}
+
+function saveStaff() {
+  var un    = document.getElementById('sm-un').value.trim().toLowerCase().replace(/\s/g,'.');
+  var name  = document.getElementById('sm-name').value.trim();
+  var pw    = document.getElementById('sm-pw').value.trim();
+  var role  = document.getElementById('sm-role').value;
+  var editUn= document.getElementById('sm-editun').value;
+  if (!un || !name || !pw) { alert('Username, name and password are required.'); return; }
+
+  // Get selected tabs
+  var allTabs = document.getElementById('sm-tab-all').checked;
+  var selTabs = allTabs ? ['all'] : [];
+  if (!allTabs) {
+    document.querySelectorAll('.sm-tab-item:checked').forEach(function(el){ selTabs.push(el.value); });
+    if (selTabs.length === 0) { alert('Please select at least one tab.'); return; }
+  }
+
+  // Get colour
+  var ci = parseInt(document.getElementById('sm-color').dataset.selected) || 0;
+  var colorData = COLOR_OPTIONS[ci] || COLOR_OPTIONS[0];
+
+  if (!editUn && USERS[un]) { alert('Username already exists. Choose a different one.'); return; }
+
+  var finalUn = editUn || un;
+  USERS[finalUn] = {
+    password: pw, role: role, displayName: name,
+    color: colorData.color, colorBg: colorData.bg, tabs: selTabs
+  };
+  saveUsers();
+  closeStaffModal();
+  renderStaffList();
+}
+
+function openEditStaff(un) { openStaffModal(un); }
+
+function deleteStaff(un) {
+  if (un === 'admin') { alert('Cannot delete the admin account.'); return; }
+  if (!confirm('Delete staff member ' + (USERS[un]?USERS[un].displayName:un) + '?')) return;
+  delete USERS[un];
+  saveUsers();
+  renderStaffList();
+}
+
+function closeStaffModal() { document.getElementById('staffModal').classList.remove('open'); }
+
+function closePwModal() {
+  document.getElementById('pwModal').classList.remove('open');
+}
+
+function openChangePw(un) {
+  var u = USERS[un];
+  if (!u) return;
+  document.getElementById('cpw-un').value = un;
+  document.getElementById('cpw-name').textContent = u.displayName + ' (@' + un + ')';
+  document.getElementById('cpw-new').value = '';
+  document.getElementById('cpw-confirm').value = '';
+  document.getElementById('cpw-err').style.display = 'none';
+  document.getElementById('pwModal').classList.add('open');
+}
+
+function saveChangePw() {
+  var un  = document.getElementById('cpw-un').value;
+  var np  = document.getElementById('cpw-new').value.trim();
+  var cp  = document.getElementById('cpw-confirm').value.trim();
+  var err = document.getElementById('cpw-err');
+  if (!np) { err.textContent = 'Password cannot be empty.'; err.style.display = 'block'; return; }
+  if (np !== cp) { err.textContent = 'Passwords do not match.'; err.style.display = 'block'; return; }
+  if (np.length < 6) { err.textContent = 'Minimum 6 characters.'; err.style.display = 'block'; return; }
+  USERS[un].password = np;
+  saveUsers();
+  document.getElementById('pwModal').classList.remove('open');
+  alert('Password updated for ' + USERS[un].displayName + '!');
+}
+
+function renderStaffList() {
+  if (!currentUser || currentUser.role !== 'admin') return;
+  var html = '';
+  Object.keys(USERS).forEach(function(un) {
+    var u = USERS[un];
+    var tabLabel = (!u.tabs || u.tabs[0]==='all') ? 'All Tabs' : u.tabs.join(', ');
+    html +=
+      '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:8px;">' +
+        '<div style="width:12px;height:12px;border-radius:50%;background:'+u.color+';flex-shrink:0"></div>' +
+        '<div style="flex:1;">' +
+          '<div style="font-weight:700;font-size:14px">'+u.displayName+' <span style="font-size:11px;color:var(--text2);font-weight:400">@'+un+'</span></div>' +
+          '<div style="font-size:11px;color:var(--text2);margin-top:2px">'+u.role+' &nbsp;&middot;&nbsp; Tabs: '+tabLabel+'</div>' +
+        '</div>' +
+        '<div style="display:flex;gap:6px;">' +
+          '<button class="note-btn" data-action="changepw" data-un="'+un+'" style="border-color:var(--yellow);color:var(--yellow)">&#128274; Password</button>' +
+          (un !== 'admin' ?
+            '<button class="note-btn" data-action="editstaff" data-un="'+un+'">Edit</button>' +
+            '<button class="del-btn" data-action="deletestaff" data-un="'+un+'">Delete</button>'
+          : '') +
+        '</div>' +
+      '</div>';
+  });
+  document.getElementById('staffList').innerHTML = html;
+}
+
+// Single event delegation handler for all interactive elements
+document.addEventListener('click', function(e) {
+  var el = e.target.closest('[data-action]') || e.target;
+  var action = el.dataset.action;
+  if (!action) return;
+  if (action === 'claim')     { claimCandidate(el.dataset.key); }
+  if (action === 'release')   { releaseCandidate(el.dataset.key); }
+  if (action === 'note')      { openNote(el.dataset.key, el.dataset.name || 'Candidate'); }
+  if (action === 'delete')    { deleteCandidate(el.dataset.tab, parseInt(el.dataset.idx)); }
+  if (action === 'switchtab') { switchTab(parseInt(el.dataset.tabidx)); }
+  if (action === 'openstaff') { openStaffModal(); }
+  if (action === 'editstaff') { openEditStaff(el.dataset.un); }
+  if (action === 'deletestaff') { deleteStaff(el.dataset.un); }
+  if (action === 'changepw')   { openChangePw(el.dataset.un); }
+});
+
+document.addEventListener('change', function(e) {
+  var el = e.target;
+  if (el.dataset.action === 'status') {
+    updateStatus(el.dataset.key, el.value, el);
+  }
+});
+
+// ── ANALYTICS REPORT ──────────────────────────────────────────
+function setPeriod(p, btn) {
+  document.querySelectorAll('.rpt-pbtn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderReport(p);
+}
+
+function renderReport(period) {
+  period = period || 'all';
+  var staffKeys = Object.keys(USERS);
+  var stats = {};
+  staffKeys.forEach(function(un) {
+    stats[un] = {
+      name:     USERS[un].displayName,
+      color:    USERS[un].color,
+      colorBg:  USERS[un].colorBg,
+      role:     USERS[un].role,
+      claimed:0, contacted:0, shortlisted:0, placed:0, rejected:0, notes:0
+    };
+  });
+
+  var totClaimed=0, totContacted=0, totShortlisted=0, totPlaced=0;
+
+  // Iterate all candidates across all tabs
+  TABS.forEach(function(tab) {
+    var rows = DB[tab];
+    rows.forEach(function(r, i) {
+      var key = tab+'_'+i;
+      var ownerKey = owners[key] || '';
+      if (!ownerKey || !stats[ownerKey]) return;
+      var s  = stats[ownerKey];
+      var st = statuses[key] || 'New';
+      s.claimed++; totClaimed++;
+      if (st==='Contacted')  { s.contacted++;   totContacted++;   }
+      if (st==='Shortlisted'){ s.shortlisted++;  totShortlisted++; }
+      if (st==='Placed')     { s.placed++;       totPlaced++;      }
+      if (st==='Rejected')   s.rejected++;
+      var na = notes[key] || [];
+      na.forEach(function(n) {
+        if (n.by === USERS[ownerKey].displayName) s.notes++;
+      });
+    });
+  });
+
+  // ── STAFF CARDS ───────────────────────────────────────────────
+  var cardsHtml = '';
+  staffKeys.forEach(function(un) {
+    var s    = stats[un];
+    var rate = s.claimed > 0 ? Math.round((s.placed/s.claimed)*100) : 0;
+    var rc   = rate >= 20 ? '#34d399' : rate >= 10 ? '#fbbf24' : '#f87171';
+    cardsHtml +=
+      '<div class="staff-card">' +
+        '<div class="sc-bar" style="background:'+s.color+'"></div>' +
+        '<div class="sc-name">'+s.name+'</div>' +
+        '<div class="sc-role">'+s.role+'</div>' +
+        '<div class="sc-metrics">' +
+          '<div class="sc-metric"><div class="sc-val" style="color:'+s.color+'">'+s.claimed+'</div><div class="sc-lbl">Claimed</div></div>' +
+          '<div class="sc-metric"><div class="sc-val" style="color:#60a5fa">'+s.contacted+'</div><div class="sc-lbl">Contacted</div></div>' +
+          '<div class="sc-metric"><div class="sc-val" style="color:#c4b5fd">'+s.shortlisted+'</div><div class="sc-lbl">Shortlisted</div></div>' +
+          '<div class="sc-metric"><div class="sc-val" style="color:#34d399">'+s.placed+'</div><div class="sc-lbl">Placed</div></div>' +
+        '</div>' +
+        '<div class="conv-rate" style="background:'+rc+'22;color:'+rc+'">'+rate+'% placement rate</div>' +
+        (s.notes ? '<div style="font-size:11px;color:var(--text2);margin-top:8px">&#128221; '+s.notes+' notes added</div>' : '') +
+      '</div>';
+  });
+  document.getElementById('staffCards').innerHTML = cardsHtml;
+
+  // ── FUNNEL ────────────────────────────────────────────────────
+  var maxF = totClaimed || 1;
+  var funnelData = [
+    {label:'Claimed',     count:totClaimed,     color:'#3b82f6'},
+    {label:'Contacted',   count:totContacted,   color:'#8b5cf6'},
+    {label:'Shortlisted', count:totShortlisted, color:'#f59e0b'},
+    {label:'Placed',      count:totPlaced,      color:'#10b981'}
+  ];
+  var funnelHtml = '';
+  funnelData.forEach(function(fd) {
+    var pct = Math.round((fd.count/maxF)*100);
+    funnelHtml +=
+      '<div class="funnel-row">' +
+        '<div class="funnel-label">'+fd.label+'</div>' +
+        '<div class="funnel-bar-wrap">' +
+          '<div class="funnel-bar" style="width:'+pct+'%;background:'+fd.color+'">' +
+            (pct>10?pct+'%':'') +
+          '</div>' +
+        '</div>' +
+        '<div class="funnel-count">'+fd.count+'</div>' +
+      '</div>';
+  });
+  document.getElementById('funnelWrap').innerHTML = funnelHtml;
+
+  // ── COMPARISON TABLE ──────────────────────────────────────────
+  var maxCl = Math.max.apply(null, staffKeys.map(function(u){ return stats[u].claimed; })) || 1;
+  var compHtml = '';
+  staffKeys.forEach(function(un) {
+    var s    = stats[un];
+    var rate = s.claimed>0 ? Math.round((s.placed/s.claimed)*100) : 0;
+    var rc   = rate>=20?'#34d399':rate>=10?'#fbbf24':'#f87171';
+    var bw   = Math.round((s.claimed/maxCl)*120);
+    compHtml +=
+      '<tr>' +
+        '<td><span class="staff-dot" style="background:'+s.color+'"></span>'+s.name+'</td>' +
+        '<td><div class="bar-cell"><div class="mini-bar" style="width:'+bw+'px;background:'+s.color+'"></div>'+s.claimed+'</div></td>' +
+        '<td>'+s.contacted+'</td>' +
+        '<td>'+s.shortlisted+'</td>' +
+        '<td style="font-weight:700;color:#34d399">'+s.placed+'</td>' +
+        '<td style="color:#f87171">'+s.rejected+'</td>' +
+        '<td style="font-weight:700;color:'+rc+'">'+rate+'%</td>' +
+      '</tr>';
+  });
+  document.getElementById('compBody').innerHTML = compHtml;
+
+  // ── ACTIVITY FEED ─────────────────────────────────────────────
+  var activities = [];
+  TABS.forEach(function(tab) {
+    var rows = DB[tab];
+    rows.forEach(function(r, i) {
+      var key  = tab+'_'+i;
+      var na   = notes[key] || [];
+      na.forEach(function(n) {
+        activities.push({
+          text: n.by+' added a note',
+          sub:  r.name+': '+n.text.substring(0,60)+(n.text.length>60?'...':''),
+          date: n.date,
+          who:  n.by
+        });
+      });
+      if (owners[key] && statuses[key]==='Placed') {
+        var ownerNm = USERS[owners[key]] ? USERS[owners[key]].displayName : owners[key];
+        activities.push({
+          text: ownerNm+' placed a candidate',
+          sub:  r.name+' — '+tab,
+          date: new Date().toLocaleDateString('en-MY'),
+          who:  ownerNm
+        });
+      }
+    });
+  });
+
+  activities.sort(function(a,b){ return b.date > a.date ? 1 : -1; });
+  activities = activities.slice(0,20);
+
+  var actHtml = '';
+  if (!activities.length) {
+    actHtml = '<div style="color:var(--text3);font-size:13px;padding:16px">No activity yet. Staff need to claim candidates and add notes first.</div>';
+  } else {
+    activities.forEach(function(act) {
+      var dotColor = '#3b82f6';
+      var uk = Object.keys(USERS).find(function(k){ return USERS[k].displayName === act.who; });
+      if (uk) dotColor = USERS[uk].color;
+      actHtml +=
+        '<div class="act-item">' +
+          '<div class="act-dot" style="background:'+dotColor+'"></div>' +
+          '<div>' +
+            '<div class="act-text">'+act.text+'</div>' +
+            '<div class="act-sub">'+act.sub+'</div>' +
+          '</div>' +
+          '<div class="act-time">'+act.date+'</div>' +
+        '</div>';
+    });
+  }
+  document.getElementById('actFeed').innerHTML = actHtml;
+}
+</script>
+</body>
+</html>
