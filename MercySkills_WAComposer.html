@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mercy Skills — WhatsApp Job Composer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0e1a;--surface:#111827;--surface2:#1a2235;--border:#1e2d45;--accent:#3b82f6;--green:#10b981;--yellow:#f59e0b;--red:#ef4444;--text:#f1f5f9;--text2:#94a3b8;--text3:#475569;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:20px;}
+.container{max-width:600px;margin:0 auto;}
+.header{text-align:center;padding:24px 0 20px;}
+.header h1{font-size:22px;font-weight:700;color:var(--text);}
+.header p{font-size:13px;color:var(--text2);margin-top:4px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px;}
+.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.field-group{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+@media(max-width:480px){.field-group{grid-template-columns:1fr;}}
+label{font-size:12px;font-weight:600;color:var(--text2);display:block;margin-bottom:5px;}
+select,input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;}
+select:focus,input:focus{border-color:var(--accent);}
+select option{background:var(--surface);}
+.preview{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;max-height:340px;overflow-y:auto;margin-bottom:14px;}
+.btn-row{display:flex;gap:10px;}
+.btn{flex:1;padding:12px;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:opacity .15s;}
+.btn-wa{background:#25d366;color:white;}
+.btn-wa:hover{opacity:.9;}
+.btn-copy{background:var(--surface2);border:1px solid var(--border);color:var(--text);}
+.btn-copy:hover{border-color:var(--accent);color:var(--accent);}
+.btn-copy.copied{border-color:var(--green);color:var(--green);}
+.phone-row{display:flex;gap:10px;align-items:flex-end;}
+.phone-row .phone-input{flex:1;}
+.phone-row .cc-select{width:110px;flex-shrink:0;}
+.tip{font-size:11px;color:var(--text3);margin-top:5px;}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Mercy Skills</h1>
+    <p>WhatsApp Job Message Composer</p>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Candidate Details</div>
+    <div class="field-group">
+      <div>
+        <label>Candidate Name (optional)</label>
+        <input id="cname" type="text" placeholder="e.g. Ahmad" oninput="update()">
+      </div>
+      <div>
+        <label>Phone Number</label>
+        <input id="phone" type="tel" placeholder="60123456789" oninput="update()">
+        <div class="tip">Include country code, no + or spaces. e.g. 60123456789</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Job Details</div>
+    <div style="margin-bottom:12px;">
+      <label>Job Position</label>
+      <select id="jobType" onchange="updateDefaults()">
+        <option value="gw">General Worker</option>
+        <option value="forklift">Forklift Driver</option>
+        <option value="lu">Loading / Unloading Worker</option>
+        <option value="csp">Car Spare Parts Worker</option>
+        <option value="kitchen">Kitchen / F&B Crew</option>
+        <option value="om">Operation Manager</option>
+        <option value="lathe">Lathe Machine Operator</option>
+        <option value="barber">Barber</option>
+      </select>
+    </div>
+    <div class="field-group">
+      <div>
+        <label>Salary (RM)</label>
+        <input id="salary" type="text" oninput="update()">
+      </div>
+      <div>
+        <label>Location</label>
+        <input id="location" type="text" oninput="update()">
+      </div>
+    </div>
+    <div class="field-group">
+      <div>
+        <label>Working Hours</label>
+        <input id="hours" type="text" oninput="update()">
+      </div>
+      <div>
+        <label>Start Date</label>
+        <input id="startdate" type="text" placeholder="e.g. Immediately / 1 May 2026" oninput="update()">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Message Preview</div>
+    <div class="preview" id="msgPreview"></div>
+    <div class="btn-row">
+      <button class="btn btn-wa" onclick="sendWA()">&#128172; Send via WhatsApp</button>
+      <button class="btn btn-copy" id="copyBtn" onclick="copyMsg()">Copy</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var jobs = {
+  gw:{
+    title:"General Worker",emoji:"👷",
+    salary:"1,500 – 2,000",location:"Shah Alam / Klang",hours:"8 jam/hari, 6 hari/minggu",
+    desc:"Kami sedang mencari *General Worker* untuk ditempatkan bersama syarikat klien kami dalam sektor pembuatan, logistik, dan gudang.",
+    duties:["Pembungkusan, penyusunan, dan pelabelan barangan","Pemuatan dan pemunggahan bahan","Pembersihan dan penyelenggaraan umum kawasan kerja","Membantu penyelia dalam tugas harian","Mematuhi SOP dan prosedur keselamatan syarikat"],
+    req:["Lelaki / Perempuan, umur 21–45 tahun","Tiada kelayakan khusus diperlukan — latihan disediakan","Sihat tubuh badan dan mampu melakukan kerja fizikal","Permit kerja yang sah diperlukan untuk pekerja asing"],
+    provided:["Penginapan (asrama disediakan)","Elaun makan","PPE dan uniform","Pengangkutan ke tapak kerja (di mana berkenaan)"]
+  },
+  forklift:{
+    title:"Forklift Driver",emoji:"🏗️",
+    salary:"1,800 – 2,500",location:"Shah Alam / Klang",hours:"8 jam/hari, 6 hari/minggu",
+    desc:"Kami sedang mencari *Pemandu Forklift* berpengalaman untuk ditempatkan bersama syarikat klien kami dalam sektor gudang, pembuatan, dan logistik.",
+    duties:["Mengendalikan forklift untuk memuatkan, memunggah, dan memindahkan bahan","Menyusun barangan dalam gudang","Melakukan semakan keselamatan forklift sebelum operasi","Menyelenggara rekod pergerakan inventori yang tepat","Mematuhi peraturan keselamatan gudang pada setiap masa"],
+    req:["Lelaki, umur 21–45 tahun","Lesen / sijil forklift yang sah diperlukan","Minimum 1 tahun pengalaman mengendalikan forklift","Sihat tubuh badan","Permit kerja yang sah diperlukan untuk pekerja asing"],
+    provided:["Penginapan (asrama disediakan)","Elaun makan","PPE dan uniform","Pengangkutan ke tapak kerja (di mana berkenaan)"]
+  },
+  lu:{
+    title:"Loading / Unloading Worker",emoji:"📦",
+    salary:"1,500 – 2,000",location:"Shah Alam / Klang",hours:"8 jam/hari, 6 hari/minggu",
+    desc:"Kami sedang mencari *Pekerja Loading / Unloading* untuk ditempatkan bersama syarikat klien kami dalam sektor logistik, gudang, dan pengedaran.",
+    duties:["Memuat dan memunggah barangan dari lori dan kontena","Menyusun dan menimbun barangan dalam gudang","Membantu pengiraan inventori dan pergerakan stok","Mengekalkan kebersihan dan keteraturan di kawasan pemuatan","Mengikuti prosedur keselamatan pengendalian manual"],
+    req:["Lelaki, umur 21–45 tahun","Tiada kelayakan khusus diperlukan","Mesti sihat dan mampu mengangkat beban berat","Pengalaman dalam logistik atau gudang adalah kelebihan","Permit kerja yang sah diperlukan untuk pekerja asing"],
+    provided:["Penginapan (asrama disediakan)","Elaun makan","PPE dan uniform","Pengangkutan ke tapak kerja"]
+  },
+  csp:{
+    title:"Car Spare Parts Worker",emoji:"🔧",
+    salary:"1,500 – 2,000",location:"Shah Alam / Klang",hours:"8 jam/hari, 6 hari/minggu",
+    desc:"Kami sedang mencari *Pekerja Spare Parts Kereta* untuk ditempatkan di kedai spare parts dan gudang automotif.",
+    duties:["Menerima, memeriksa, dan menyusun spare parts","Membantu pelanggan mencari parts yang betul","Membungkus dan menghantar pesanan","Menyelenggara rekod inventori dan pengisian semula stok","Mengekalkan kebersihan dan keteraturan kedai"],
+    req:["Lelaki / Perempuan, umur 21–40 tahun","Pengetahuan asas spare parts kereta adalah kelebihan","Sikap yang baik, rajin, dan boleh dipercayai","Komunikasi asas dalam BM atau Inggeris","Permit kerja yang sah diperlukan untuk pekerja asing"],
+    provided:["Penginapan (di mana ada)","Elaun makan","Latihan dalam kerja disediakan"]
+  },
+  kitchen:{
+    title:"Kitchen / F&B Crew",emoji:"🍽️",
+    salary:"1,500 – 2,000",location:"Lembah Klang",hours:"Syif (8 jam/syif)",
+    desc:"Kami sedang mencari *Pembantu Dapur / Pekerja F&B* untuk ditempatkan di restoran, hotel, dan syarikat katering di seluruh Malaysia.",
+    duties:["Penyediaan makanan — membasuh, memotong, dan menyediakan bahan","Membantu chef dalam memasak dan menghidang","Membasuh pinggan dan membersihkan dapur","Mengekalkan standard kebersihan dan keselamatan makanan","Mengisi semula bekalan dan bahan dapur"],
+    req:["Lelaki / Perempuan, umur 18–40 tahun","Tiada pengalaman diperlukan — latihan dapur disediakan","Mampu bekerja dalam persekitaran yang pantas","Sanggup bekerja syif termasuk hujung minggu dan cuti umum","Permit kerja yang sah diperlukan untuk pekerja asing"],
+    provided:["Penginapan (asrama disediakan)","Makan disediakan semasa syif","Uniform disediakan","Pengangkutan ke tapak kerja (di mana berkenaan)"]
+  },
+  om:{
+    title:"Operation Manager",emoji:"📋",
+    salary:"3,500 – 5,000",location:"Lembah Klang",hours:"Isnin – Jumaat, 9pg – 6ptg",
+    desc:"Kami sedang mencari *Pengurus Operasi* berpengalaman untuk ditempatkan bersama syarikat klien kami dalam sektor pembuatan, logistik, dan perkhidmatan.",
+    duties:["Mengawasi operasi harian dan aliran pengeluaran","Mengurus dan menyelia pasukan pekerja","Memantau KPI, produktiviti, dan standard kualiti","Berhubung dengan klien, pembekal, dan jabatan dalaman","Menyediakan laporan operasi untuk pengurusan"],
+    req:["Diploma / Ijazah dalam Operasi, Perniagaan, atau bidang berkaitan","Minimum 2–3 tahun pengalaman dalam peranan operasi atau pengurusan","Kemahiran kepimpinan dan komunikasi yang kuat","Mahir dalam Microsoft Office","Permit kerja yang sah diperlukan untuk bukan warganegara"],
+    provided:["Pakej gaji yang kompetitif","Bonus prestasi","EPF, SOCSO & EIS","Kelayakan cuti tahunan"]
+  },
+  lathe:{
+    title:"Lathe Machine Operator",emoji:"⚙️",
+    salary:"2,000 – 3,000",location:"Shah Alam / Klang",hours:"8 jam/hari, 6 hari/minggu",
+    desc:"Kami sedang mencari *Operator Mesin Lathe* untuk ditempatkan bersama syarikat klien kami dalam sektor kejuruteraan presisi dan pembuatan di Selangor.",
+    duties:["Mengendalikan mesin lathe CNC atau manual","Membaca dan mentafsir lukisan teknikal dan blueprint","Mengukur dan memeriksa bahagian yang dimesin untuk ketepatan","Melakukan penyelenggaraan dan pembersihan rutin mesin","Melaporkan kecacatan atau masalah mesin kepada penyelia"],
+    req:["Lelaki, umur 21–45 tahun","Minimum 1–2 tahun pengalaman sebagai operator lathe","Mampu membaca lukisan teknikal","Pengalaman dengan mesin CNC adalah kelebihan","Permit kerja yang sah diperlukan untuk pekerja asing"],
+    provided:["Penginapan (di mana ada)","PPE dan peralatan disediakan","Peluang kerja lebih masa tersedia"]
+  },
+  barber:{
+    title:"Barber",emoji:"✂️",
+    salary:"1,800 – 3,000",location:"Seluruh Malaysia",hours:"6 hari/minggu (syif)",
+    desc:"Kami sedang mencari *Tukang Gunting Rambut (Barber)* yang berkelayakan untuk ditempatkan di kedai gunting rambut dan salon yang telah ditubuhkan di seluruh Malaysia.",
+    duties:["Melakukan perkhidmatan gunting rambut, styling, dan grooming","Perkhidmatan trimming dan shaving janggut","Mengekalkan kebersihan dan higien stesen kerja","Memberi nasihat kepada pelanggan tentang gaya rambut yang sesuai","Menjual produk grooming di mana berkenaan"],
+    req:["Lelaki, umur 20–45 tahun","Minimum 1–2 tahun pengalaman sebagai barber","Pengetahuan tentang teknik potongan moden dan tradisional","Kemahiran perkhidmatan pelanggan yang baik","Permit kerja yang sah diperlukan untuk pekerja asing"],
+    provided:["Gaji kompetitif + tips","Penginapan (di mana ada)","Peralatan dan kelengkapan disediakan oleh majikan"]
+  }
+};
+
+function updateDefaults(){
+  var j=jobs[document.getElementById('jobType').value];
+  document.getElementById('salary').value=j.salary;
+  document.getElementById('location').value=j.location;
+  document.getElementById('hours').value=j.hours;
+  update();
+}
+
+function buildMsg(){
+  var type=document.getElementById('jobType').value;
+  var salary=document.getElementById('salary').value||'[Gaji]';
+  var location=document.getElementById('location').value||'[Lokasi]';
+  var hours=document.getElementById('hours').value||'[Waktu kerja]';
+  var startdate=document.getElementById('startdate').value;
+  var cname=document.getElementById('cname').value;
+  var j=jobs[type];
+  var greeting=cname?'Hi '+cname+',':'Hi,';
+  var duties=j.duties.map(function(d){return'   • '+d;}).join('\n');
+  var reqs=j.req.map(function(r){return'   • '+r;}).join('\n');
+  var provided=j.provided.map(function(p){return'   • '+p;}).join('\n');
+  var startLine=startdate?'\n🗓️ Tarikh Mula: '+startdate:'';
+
+  return greeting+'\n\n'+
+'Saya dari *Mercy Skills Consultancy* — agensi pekerjaan berlesen yang membantu pekerja mendapatkan penempatan kerja yang sesuai di Malaysia.\n\n'+
+j.emoji+' *Jawatan: '+j.title+'*\n'+
+'📍 Lokasi: '+location+'\n'+
+'💰 Gaji: RM '+salary+' sebulan\n'+
+'⏰ Waktu Kerja: '+hours+
+startLine+'\n\n'+
+'➖➖➖➖➖➖➖➖➖➖\n\n'+
+'*Tentang Kerja Ini:*\n'+
+j.desc+'\n\n'+
+'*Tugas & Tanggungjawab:*\n'+duties+'\n\n'+
+'*Kelayakan Diperlukan:*\n'+reqs+'\n\n'+
+'*Apa Yang Disediakan:*\n'+provided+'\n\n'+
+'➖➖➖➖➖➖➖➖➖➖\n\n'+
+'Berminat atau ada soalan? Hubungi kami sekarang:\n\n'+
+'📞 *+60199888720*\n'+
+'📧 mercyskills11@gmail.com\n\n'+
+'_Mercy Skills — Menghubungkan pekerja yang tepat dengan majikan yang tepat._';
+}
+
+function update(){
+  document.getElementById('msgPreview').textContent=buildMsg();
+}
+
+function sendWA(){
+  var phone=document.getElementById('phone').value.replace(/[^0-9]/g,'');
+  var msg=buildMsg();
+  var url='https://wa.me/'+(phone?phone:'')+'?text='+encodeURIComponent(msg);
+  window.open(url,'_blank');
+}
+
+function copyMsg(){
+  navigator.clipboard.writeText(buildMsg()).then(function(){
+    var btn=document.getElementById('copyBtn');
+    btn.textContent='Copied!';
+    btn.classList.add('copied');
+    setTimeout(function(){btn.textContent='Copy';btn.classList.remove('copied');},2000);
+  });
+}
+
+updateDefaults();
+</script>
+</body>
+</html>
